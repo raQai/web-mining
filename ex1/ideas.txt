@@ -18,4 +18,14 @@
       @param stopwords -> document with stop words
       @param doc, ... -> 1 or multiple documents
 
+    @update_01
+    1 script version
+      input parameters
+      -i <file>
+        input file
+      -c <file>
+        comparable files
+      -s <file>
+        stop word file
+
 3.
