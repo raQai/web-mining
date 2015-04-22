@@ -1,0 +1,21 @@
+1.
+
+2.  ignore case
+    split on space ' '
+    output
+      total word count
+      results as list
+        <word> - count: 0000 (00,00%)
+
+    versions ->
+      full text analysis
+      @param doc -> 1 document
+
+      text compare top 30
+      @param doc, ... -> multiple documents
+
+      text compare no stop words
+      @param stopwords -> document with stop words
+      @param doc, ... -> 1 or multiple documents
+
+3.
