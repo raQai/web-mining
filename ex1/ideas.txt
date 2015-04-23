@@ -28,4 +28,10 @@
       -s <file>
         stop word file
 
+    @update_02
+    @with texteinlesen.py
+      2 dim array fuer index von wörtern
+      -> sorted(<array) mit index
+      -> berechnung relativer häufigkeit durch len(<array>)
+
 3.
