@@ -1,0 +1,4 @@
+1) 
+
+2)
+	a) Die 30 am häufigsten Vorkommenden Worte sind bei den Texten fast identisch, somit würden die Texte bei einer Klassifizierung über die 30 häufigsten Worte wahrscheinlich fast alle Texte einer Klasse zuordnen. Somit sollten diese für eine Klassifizierung ignoriert werden. Dies geschieht mit Hilfe von Stop Words.
