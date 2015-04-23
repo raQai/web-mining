@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 textEingabe=open("einlesen.txt", "r")  //.read() liest ganzen text
 
 textEingabe.close()
