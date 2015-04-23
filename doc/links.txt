@@ -2,3 +2,6 @@ useful links
 
 python tutorial
 https://docs.python.org/2/tutorial/
+
+pyton file usage
+http://www.tutorialspoint.com/python/python_files_io.htm
