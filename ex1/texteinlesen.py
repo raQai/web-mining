@@ -3,7 +3,7 @@
 # Beispiel
 #textEingabe=open('ebooks/Ten_Acres_Enough_by_Edmund_Morris.txt').read()
 #textEingabe=open('stopwords/german').read()
-textEingabe=open('ebooks/Die_Geschwister_Ein_Schauspiel_in_einem_Akt_by_Johann_Wolfgang_von_Goethe.txt').read()
+textEingabe=open('ebooks/Die_Geschwister_Ein_Schauspiel_in_einem_Akt_by_Johann_Wolfgang_von_Goethe.txt', "r", encoding = "utf-8").read()
 stopWordsDoc = ''
 stopWordsDoc = open('stopwords/german').read()
 
@@ -44,4 +44,5 @@ def count_words(text):
   #displaying results
   return "\n".join(sorted(result))
 
-print(count_words("hallo mein ?!name ist patrick.--neben mir sitzt  christian"))
+print(count_words(textEingabe))
+#print(count_words("hallo mein ?!name ist patrick.--neben mir sitzt  christian"))
