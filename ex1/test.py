@@ -12,7 +12,7 @@ STOPMARKS = [",", ";", ".", ":", '"', "'", "?", "!", "<", ">", "(", ")", "[", "]
 # cfg
 top_words = 30				# displays this amount of words
 read_stopwords = True		# reads and removes stopwords
-language = "english"			# language of read document
+language = "german"			# language of read document
 codec = "utf-8"				# codec of read document
 mode = WORD					# mode = WORD, PAIR, CHAR
 use_global_count = True		# if set counts stopwords to total-counts
@@ -26,7 +26,7 @@ if(read_stopwords):
 	file_stopwords = open(path_stopwords, "r", encoding = codec)
 
 # results output_file file
-output_file_file = "lili"
+output_file_file = "results"
 file_listoutput_file = open(output_file_file, "w", encoding = codec)
 output_occ_file = output_file_file + "_OCC"
 if(count_occurences):
