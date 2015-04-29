@@ -10,11 +10,14 @@ PAIR = 2
 STOPMARKS = [",", ";", ".", ":", '"', "'", "?", "!", "<", ">", "(", ")", "[", "]", "-", "_"]
 
 # cfg
-top_words = 30
-read_stopwords = False
+top_words = 30000
+read_stopwords = True
 language = "german"
 codec = "utf-8"
-mode = CHAR
+mode = WORD
+
+# counts stopwords to counter if set
+use_global_count = True
 
 # files
 path_stopwords = "stopwords/" + language
@@ -26,6 +29,8 @@ if(read_stopwords):
 output_file_file = "results.txt"
 file_listoutput_file = open(output_file_file, "w", encoding = codec)
 
+
+global_words = []
 
 ###
 ### MAIN FUNCTION
@@ -49,11 +54,14 @@ def main():
 	# remove marks
 	for char in STOPMARKS:
 		text = text.replace(char, " ")
-	
 
-	
 	# convert to array
 	words = text.split()
+	
+	# set global variables
+	global global_words
+	global_words = list(words)
+
 	print("total words:", len(words))
 
 	# remove stopwords
@@ -94,25 +102,43 @@ def remove_stopwords(words):
 	
 ### PRINTS THE FIRST i ITEMS
 def print_tuple_list(tuple_list, top_words):
-	length = len(tuple_list)
+	global global_words
+	
+	total_count = 0
+	if use_global_count:
+		total_count = count_by_mode(global_words)
+	else:
+		for tuple in tuple_list:
+			total_count += tuple[1]
+	
 	print()
 	print(top_words, "most used words:")
 	print("#", '\t', "total", '\t', "rel.", '\t\t', "word")
-
-	for x in range(0, min(top_words, length)):
-		print(x, '\t', tuple_list[x][1], '\t', "{:10.5f}".format(tuple_list[x][1]/length), '\t', tuple_list[x][0])
+	
+	count = 0
+	for x in range(0, min(top_words, len(tuple_list))):
+		count += tuple_list[x][1]/total_count
+		print(x, '\t', tuple_list[x][1], '\t', "{:10.5f}".format(tuple_list[x][1]/total_count), '\t', tuple_list[x][0])
 		
+	print("total:", count)
 	return
 	
 ### WRITES THE TUPLE LIST TO THE output_file FILE
-def write_tuple_list(tuple_list, top_words, output_file):
-	length = len(tuple_list)
-
-	for x in range(0, min(top_words, length)):
+def write_tuple_list(tuple_list, top_words, output_file):	
+	global global_words
+	
+	total_count = 0
+	if use_global_count:
+		total_count = count_by_mode(global_words)
+	else:
+		for tuple in tuple_list:
+			total_count += tuple[1]
+	
+	for x in range(0, min(top_words, len(tuple_list))):
 		line = ''
 		word = tuple_list[x][0]
 		abs = tuple_list[x][1]
-		rel = "{:10.5f}".format(tuple_list[x][1]/length)
+		rel = "{:10.5f}".format(tuple_list[x][1]/total_count)
 
 		line += str(x) + '\t' + str(abs) + '\t' + rel + '\t' + word + '\n'
 	
@@ -128,7 +154,7 @@ def create_tuple_list(word_list):
 	item_counter = []
 
 	if(mode == WORD):
-		item_list = word_list
+		item_list = create_word_list(word_list)
 	if(mode == CHAR):
 		item_list = create_char_list(word_list)
 	if(mode == PAIR):
@@ -155,6 +181,9 @@ def create_tuple_list(word_list):
 	# return sorted tuple words (word w, count(w))
 	return tuple_items
 	
+### CEATES LIST OF WORDS
+def create_word_list(word_list):
+	return word_list
 	
 ### CREATES LIST OF CHARS
 def create_char_list(word_list):
@@ -174,6 +203,25 @@ def create_pair_list(word_list):
 				buff.append(word[i:i+2])
 	
 	return buff
+	
+### RETURNS ITEM COUNT DEPENDING ON MODE
+def count_by_mode(word_list):
+	count = 0
+	if(mode == WORD):
+		count = len(word_list)
+	if(mode == PAIR):
+		for word in word_list:
+			if len(word) > 1:
+				for i in range(0,len(word)-1):
+					count += 1
+	if(mode == CHAR):
+		for word in word_list:
+			for char in word:
+				count += 1
+
+	return count
+	
+		
 	
 ## call main
 main()
