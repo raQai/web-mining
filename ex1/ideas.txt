@@ -34,6 +34,17 @@
       -> sorted(<array) mit index
       -> berechnung relativer häufigkeit durch len(<array>)
 
+    -i <file> // set input file
+    -o <file> // set output file
+    -s <lang> // read_stopwords
+    -n <numb> // top_words
+    --word // mode (exclude other modes) 
+    --char // mode (exclude other modes) 
+    --pair // mode (exclude other modes)
+    --use-global-count // use_clobal_count
+    --count-occurences // count_occurences + add output file _oc
+
+
 3.
 
 
