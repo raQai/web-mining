@@ -17,6 +17,7 @@ codec = "utf-8"				# codec of read document
 mode = WORD					# mode = WORD, PAIR, CHAR
 use_global_count = True		# if set counts stopwords to total-counts
 count_occurences = True		# if set counts and writes occurences of words
+print_on_cmd = True			# if set prints results also on cmd-line
 
 # files
 path_stopwords = "stopwords/" + language
@@ -76,9 +77,10 @@ def main():
 	print("unique words:", len(unique_word_tuples))
 
 	# print top
-	print()
-	print(top_words, "most used words:")
-	print_tuple_list(unique_word_tuples, top_words)
+	if(print_on_cmd):
+		print()
+		print(top_words, "most used words:")
+		print_tuple_list(unique_word_tuples, top_words)
 	
 	write_tuple_list(unique_word_tuples, top_words, file_listoutput_file)
 	
@@ -92,9 +94,10 @@ def main():
 		occ_tuple = convert_tuple_list(unique_word_tuples)
 		
 		# print
-		print()
-		print(top_words, "top occurences of words")
-		print_tuple_list(occ_tuple, top_words)
+		if(print_on_cmd):
+			print()
+			print(top_words, "top occurences of words")
+			print_tuple_list(occ_tuple, top_words)
 	
 		# write
 		write_tuple_list(occ_tuple, top_words, file_occ_output_file)
@@ -168,7 +171,6 @@ def write_tuple_list(tuple_list, top_words, output_file):
 		# write line
 		output_file.write(line)
 
-	print("file write finished")
 	return
 	
 ### COUNTS UNIQUE WORDS AND RETURNS A LIST OF TUPLES
