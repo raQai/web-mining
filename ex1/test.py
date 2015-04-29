@@ -2,22 +2,25 @@
 # -*- coding: iso-8859-1 -*-
 import sys
 import fileinput
-import math
+
+# const
+WORD = 0
+CHAR = 1
+PAIR = 2
+STOPMARKS = [",", ";", ".", ":", '"', "'", "?", "!", "<", ">", "(", ")", "[", "]", "-", "_"]
 
 # cfg
 top_words = 30
-read_stopwords = True
+read_stopwords = False
 language = "german"
 codec = "utf-8"
+mode = CHAR
 
 # files
 path_stopwords = "stopwords/" + language
 file_stopwords = ""
 if(read_stopwords):
 	file_stopwords = open(path_stopwords, "r", encoding = codec)
-
-# stopmarks to be removed
-stopmarks = [",", ";", ".", ":", '"', "'", "?", "!", "<", ">", "(", ")", "[", "]", "-", "_"]
 
 # results output_file file
 output_file_file = "results.txt"
@@ -44,7 +47,7 @@ def main():
 	text = text.lower()
 	
 	# remove marks
-	for char in stopmarks:
+	for char in STOPMARKS:
 		text = text.replace(char, " ")
 	
 
@@ -118,14 +121,22 @@ def write_tuple_list(tuple_list, top_words, output_file):
 
 	print("file write finished")
 	return
-
+	
 ### COUNTS UNIQUE WORDS AND RETURNS A LIST OF TUPLES
 def create_tuple_list(word_list):
 	unique_items = []
 	item_counter = []
+
+	if(mode == WORD):
+		item_list = word_list
+	if(mode == CHAR):
+		item_list = create_char_list(word_list)
+	if(mode == PAIR):
+		item_list = create_pair_list(word_list)
+		
 	
 	# filter words
-	for item in word_list:
+	for item in item_list:
 		if item not in unique_items:
 			unique_items.append(item)
 			item_counter.append(1)
@@ -143,6 +154,26 @@ def create_tuple_list(word_list):
 		
 	# return sorted tuple words (word w, count(w))
 	return tuple_items
+	
+	
+### CREATES LIST OF CHARS
+def create_char_list(word_list):
+	buff = []
+	for word in word_list:
+		for char in word:
+			buff.append(char)
+	
+	return buff
+	
+### CREATES LIST OF PAIRS
+def create_pair_list(word_list):
+	buff = []
+	for word in word_list:
+		if len(word) > 1:
+			for i in range(0,len(word)-1):
+				buff.append(word[i:i+2])
+	
+	return buff
 	
 ## call main
 main()
