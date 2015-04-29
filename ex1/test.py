@@ -10,14 +10,12 @@ PAIR = 2
 STOPMARKS = [",", ";", ".", ":", '"', "'", "?", "!", "<", ">", "(", ")", "[", "]", "-", "_"]
 
 # cfg
-top_words = 30000
-read_stopwords = True
-language = "german"
-codec = "utf-8"
-mode = WORD
-
-# counts stopwords to counter if set
-use_global_count = True
+top_words = 30				# displays this amount of words
+read_stopwords = True		# reads and removes stopwords
+language = "german"			# language of read document
+codec = "utf-8"				# codec of read document
+mode = WORD					# mode = WORD, PAIR, CHAR
+use_global_count = True		# if set counts stopwords to total-counts
 
 # files
 path_stopwords = "stopwords/" + language
@@ -120,7 +118,7 @@ def print_tuple_list(tuple_list, top_words):
 		count += tuple_list[x][1]/total_count
 		print(x, '\t', tuple_list[x][1], '\t', "{:10.5f}".format(tuple_list[x][1]/total_count), '\t', tuple_list[x][0])
 		
-	print("total:", count)
+	print("sum of shown rel.:", count)
 	return
 	
 ### WRITES THE TUPLE LIST TO THE output_file FILE
@@ -220,8 +218,6 @@ def count_by_mode(word_list):
 				count += 1
 
 	return count
-	
-		
 	
 ## call main
 main()
