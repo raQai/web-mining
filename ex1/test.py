@@ -14,7 +14,7 @@ top_words = 30				# displays this amount of words
 read_stopwords = True		# reads and removes stopwords
 language = "german"			# language of read document
 codec = "utf-8"				# codec of read document
-mode = PAIR					# mode = WORD, PAIR, CHAR
+mode = WORD					# mode = WORD, PAIR, CHAR
 use_global_count = True		# if set counts stopwords to total-counts
 count_occurences = True		# if set counts and writes occurences of words
 
@@ -27,7 +27,7 @@ if(read_stopwords):
 # results output_file file
 output_file_file = "results.txt"
 file_listoutput_file = open(output_file_file, "w", encoding = codec)
-output_occ_file = "occurences.txt"
+output_occ_file = output_file_file + "_OCC"
 if(count_occurences):
 	file_occ_output_file = open(output_occ_file, "w", encoding = codec)
 
@@ -82,7 +82,7 @@ def main():
 	
 	write_tuple_list(unique_word_tuples, top_words, file_listoutput_file)
 	
-	# if coutn occurences
+	# if count occurences
 	if count_occurences:
 		# set global count false for occurences output
 		temp = use_global_count
