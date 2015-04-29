@@ -5,23 +5,23 @@ import fileinput
 import math
 
 # cfg
-top_words = 1300
-normalize = True
-removemarks = True
-
+top_words = 30
+read_stopwords = True
 language = "german"
-output_file = "results.txt"
 codec = "utf-8"
 
 # files
 path_stopwords = "stopwords/" + language
-file_stopwords = open(path_stopwords, "r", encoding = codec)
+file_stopwords = ""
+if(read_stopwords):
+	file_stopwords = open(path_stopwords, "r", encoding = codec)
 
-path_stopmarks = "stopwords/stopmarks"
-file_stopmarks = open(path_stopmarks, "r", encoding = codec)
-stopmarks = file_stopmarks.read()
+# stopmarks to be removed
+stopmarks = [",", ";", ".", ":", '"', "'", "?", "!", "<", ">", "(", ")", "[", "]", "-", "_"]
 
-file_listoutput = open(output_file, "w", encoding = codec)
+# results output_file file
+output_file_file = "results.txt"
+file_listoutput_file = open(output_file_file, "w", encoding = codec)
 
 
 ###
@@ -34,156 +34,110 @@ def main():
 		print("not enough arguments -> exit")
 		sys.exit()
 
+		
+	
 	# read file from input
 	# text = txt_read(fileinput.input())
 	text = txt_read(fileinput.FileInput(openhook=fileinput.hook_encoded(codec)))
 
-	# remove marks
-	if(removemarks):
-		text = txt_removemarks(text)
-	
 	# normalize
-	if(normalize):
-		text = txt_normalize(text)
+	text = text.lower()
 	
-	# count
-	txt_count(text)
+	# remove marks
+	for char in stopmarks:
+		text = text.replace(char, " ")
+	
+	# convert to array
+	words = text.split()
+
+	print("total words:", len(words))
 	
 	# sort
-	tuple = list_count_without_stopwords(text)
+	unique_word_tuples = create_word_tuples(words)
 	
-	print("unique words:", len(tuple))
+	print("unique words:", len(unique_word_tuples))
 
 	# print top 30
-	tuple_list_print(tuple, top_words)
+	tuple_list_print(unique_word_tuples, top_words)
 	
-	tuple_list_write(tuple, top_words, file_listoutput)
+	tuple_list_write(unique_word_tuples, top_words, file_listoutput_file)
 	sys.exit()
 	return
 
-### PRINT TEXT LINE BY LINE
-def txt_print(input):
-	for line in input:
-		print(line)
-	return
-
+# TODO: remove when options/parameters implemented
 def txt_read(input):
 	buff = ""
 	for line in input:
 		buff = buff + line
-	return buff
-	
-### COUNT WORDS IN TEXT
-def txt_count(input):
-	counter = 0
-
-	words = input.split()
-	for word in words:
-		counter = counter + 1
-
-	print("total words:", counter)
-	return
-	
-### NORMALIZES INPUT TEXT, REMOVES , . ' etc. letters and makes all lowercase
-def txt_normalize(input):
-	flag = True
-	buff = ""
-	for word in input.split():
-		if flag:
-			buff = buff + word.lower()
-			flag = False
-		else:
-			buff = buff + " " + word.lower()
-
-	return buff
-		
-### REMOVES MARKS AND REPLACES THEM WITH " " SPACE		
-def txt_removemarks(input):
-	buff = ""
-	for line in input:
-		for char in stopmarks:
-			if(removemarks):
-				line = line.replace(char, " ")
-		buff = buff + line
-
-	return buff
-	
+	return buff	
 
 ### PRINTS THE FIRST i ITEMS
-def tuple_list_print(tuple_list, i):
+def tuple_list_print(tuple_list, top_words):
 	length = len(tuple_list)
 	print()
-	print(i, "most used words:")
+	print(top_words, "most used words:")
 	print("#", '\t', "total", '\t', "rel.", '\t\t', "word")
 
-	max = i
-	if(i > length):
-		max = length
-		
-	x = 0
-	while x < max:
-		print(x, '\t', tuple_list[x][1], '\t', math.floor(tuple_list[x][1]/length*10000)/10000, '\t', tuple_list[x][0])
-		x = x + 1
+	for x in range(0, min(top_words, length)):
+		print(x, '\t', tuple_list[x][1], '\t', "{:10.5f}".format(tuple_list[x][1]/length), '\t', tuple_list[x][0])
 		
 	return
 	
-### WRITES THE TUPLE LIST TO THE OUTPUT FILE
-def tuple_list_write(tuple_list, i, output):
+### WRITES THE TUPLE LIST TO THE output_file FILE
+def tuple_list_write(tuple_list, top_words, output_file):
 	length = len(tuple_list)
-	
-	max = i
-	if(i > length):
-		max = length
-		
-	x = 0
-	while x < max:
+
+	for x in range(0, min(top_words, length)):
 		line = ''
 		word = tuple_list[x][0]
 		abs = tuple_list[x][1]
-		rel = math.floor(tuple_list[x][1]/length*10000)/10000
+		rel = "{:10.5f}".format(tuple_list[x][1]/length)
 
-		line = line + str(x) + '\t' + str(abs) + '\t' + str(rel) + '\t' + word + '\n'
+		line += str(x) + '\t' + str(abs) + '\t' + rel + '\t' + word + '\n'
 	
 		# write line
-		output.write(line)
-		x = x + 1
-	
+		output_file.write(line)
+
 	print("file write finished")
 	return
 
-### COUNTS WORDS WITHOUT STOPWORDS
-def list_count_without_stopwords(list):
-	list2 = []
-	counter = []
-	stopwords = file_stopwords.read()
+### COUNTS UNIQUE WORDS WITHOUT STOPWORDS IF SET AND RETURNS A LIST OF TUPLES
+def create_word_tuples(words):
+	unique_words = []
+	unique_words_counter = []
 	
-	rem_counter = 0
+	stopwords = ""
+	# read if flag set
+	if(read_stopwords):
+		stopwords = file_stopwords.read()
 	
-	tuple_list = []
-	
+	rem_stopwords = 0
+
 	# filter words
-	for a in list.split():
-		if a not in stopwords:
-			if a not in list2:
-				list2.append(a)
-				counter.append(1)
+	for word in words:
+		if word not in stopwords:
+			if word not in unique_words:
+				unique_words.append(word)
+				unique_words_counter.append(1)
 			else:
-				index = list2.index(a)
-				counter[index] = counter[index] + 1
+				index = unique_words.index(word)
+				unique_words_counter[index] += 1
 		else:
-				rem_counter = rem_counter + 1
+				rem_stopwords += 1
 	
-	print("removed stopmarks:", rem_counter)
+	# print
+	print("removed stopwords:", rem_stopwords)
+
+	# create tuple words
+	tuple_words = []
+	for i in range(len(unique_words)):
+		tuple_words.append((unique_words[i], unique_words_counter[i]))
 	
-	# create tuple list
-	for i in range(len(list2)):
-		tuple_list.append((list2[i], counter[i]))
-	
-	# sort list
-	tuple_list_sort = sorted(tuple_list,key=lambda x: x[1], reverse=True)
+	# sort words
+	tuple_words = sorted(tuple_words, key=lambda x: x[1], reverse=True)
 		
-	# return sorted tuple list (word w, count(w))
-	return tuple_list_sort
+	# return sorted tuple words (word w, count(w))
+	return tuple_words
 	
 ## call main
 main()
