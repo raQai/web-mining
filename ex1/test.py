@@ -14,7 +14,7 @@ top_words = 30				# displays this amount of words
 read_stopwords = True		# reads and removes stopwords
 language = "german"			# language of read document
 codec = "utf-8"				# codec of read document
-mode = WORD					# mode = WORD, PAIR, CHAR
+mode = PAIR					# mode = WORD, PAIR, CHAR
 use_global_count = True		# if set counts stopwords to total-counts
 count_occurences = True		# if set counts and writes occurences of words
 
@@ -76,18 +76,30 @@ def main():
 	print("unique words:", len(unique_word_tuples))
 
 	# print top
+	print()
+	print(top_words, "most used words:")
 	print_tuple_list(unique_word_tuples, top_words)
 	
 	write_tuple_list(unique_word_tuples, top_words, file_listoutput_file)
 	
 	# if coutn occurences
 	if count_occurences:
+		# set global count false for occurences output
 		temp = use_global_count
 		use_global_count = False
+		
+		# calculate occurences tuple
 		occ_tuple = convert_tuple_list(unique_word_tuples)
+		
+		# print
+		print()
+		print(top_words, "top occurences of words")
 		print_tuple_list(occ_tuple, top_words)
 	
+		# write
 		write_tuple_list(occ_tuple, top_words, file_occ_output_file)
+		
+		# re-set flag
 		use_global_count = temp
 
 	sys.exit()
@@ -124,8 +136,6 @@ def print_tuple_list(tuple_list, top_words):
 		for tuple in tuple_list:
 			total_count += tuple[1]
 	
-	print()
-	print(top_words, "most used words:")
 	print("#", '\t', "total", '\t', "rel.", '\t\t', "word")
 	
 	count = 0
@@ -256,11 +266,8 @@ def convert_tuple_list(tuple_list):
 	
 	# sort words
 	tuple_items = sorted(tuple_items, key=lambda x: x[0])
-	
-	print("printing new list")
-	for tuple in tuple_items:
-		print(tuple[0], tuple[1])
-	
+
+	# return
 	return tuple_items
 	
 ## call main
