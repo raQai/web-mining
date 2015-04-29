@@ -16,6 +16,7 @@ language = "german"			# language of read document
 codec = "utf-8"				# codec of read document
 mode = WORD					# mode = WORD, PAIR, CHAR
 use_global_count = True		# if set counts stopwords to total-counts
+count_occurences = True		# if set counts and writes occurences of words
 
 # files
 path_stopwords = "stopwords/" + language
@@ -26,7 +27,9 @@ if(read_stopwords):
 # results output_file file
 output_file_file = "results.txt"
 file_listoutput_file = open(output_file_file, "w", encoding = codec)
-
+output_occ_file = "occurences.txt"
+if(count_occurences):
+	file_occ_output_file = open(output_occ_file, "w", encoding = codec)
 
 global_words = []
 
@@ -57,6 +60,7 @@ def main():
 	words = text.split()
 	
 	# set global variables
+	global use_global_count
 	global global_words
 	global_words = list(words)
 
@@ -71,10 +75,21 @@ def main():
 	
 	print("unique words:", len(unique_word_tuples))
 
-	# print top 30
+	# print top
 	print_tuple_list(unique_word_tuples, top_words)
 	
 	write_tuple_list(unique_word_tuples, top_words, file_listoutput_file)
+	
+	# if coutn occurences
+	if count_occurences:
+		temp = use_global_count
+		use_global_count = False
+		occ_tuple = convert_tuple_list(unique_word_tuples)
+		print_tuple_list(occ_tuple, top_words)
+	
+		write_tuple_list(occ_tuple, top_words, file_occ_output_file)
+		use_global_count = temp
+
 	sys.exit()
 	return
 
@@ -138,7 +153,7 @@ def write_tuple_list(tuple_list, top_words, output_file):
 		abs = tuple_list[x][1]
 		rel = "{:10.5f}".format(tuple_list[x][1]/total_count)
 
-		line += str(x) + '\t' + str(abs) + '\t' + rel + '\t' + word + '\n'
+		line += str(x) + '\t' + str(abs) + '\t' + rel + '\t' + str(word) + '\n'
 	
 		# write line
 		output_file.write(line)
@@ -218,6 +233,35 @@ def count_by_mode(word_list):
 				count += 1
 
 	return count
+	
+### CONVERTS TUPLE-LIST (word, occurence) TO TUPLE-LIST (occurence, sum(words with occ))
+def convert_tuple_list(tuple_list):
+	buff = []
+	
+	unique_occurences = []
+	item_counter = []
+	
+	for tuple in tuple_list:
+		if tuple[1] in unique_occurences:
+			index = unique_occurences.index(tuple[1])
+			item_counter[index] += 1
+		else:
+			unique_occurences.append(tuple[1])
+			item_counter.append(1)
+			
+	# create tuple occ
+	tuple_items = []
+	for i in range(len(unique_occurences)):
+		tuple_items.append((unique_occurences[i], item_counter[i]))
+	
+	# sort words
+	tuple_items = sorted(tuple_items, key=lambda x: x[0])
+	
+	print("printing new list")
+	for tuple in tuple_items:
+		print(tuple[0], tuple[1])
+	
+	return tuple_items
 	
 ## call main
 main()
