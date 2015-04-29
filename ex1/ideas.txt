@@ -41,20 +41,20 @@ A1:
 
 A2:
 x2.1 sortierte liste aller wörter mit abs/rel häufigkeit
-2.2 30 top words in mehreren Dokumenten vergleichen
+ 2.2 30 top words in mehreren Dokumenten vergleichen
       -> für Klassifizierung geeignet? Warum?
-2.3 Stopwords eingeben, 2.2 wiederholen
+ 2.3 Stopwords eingeben, 2.2 wiederholen
 
 A3:
-3.1 Zipf-Verteilung anhand der gegebenend Dokumente prüfen
+ 3.1 Zipf-Verteilung anhand der gegebenend Dokumente prüfen
 x3.2 @plot (normal/doppelt log) häufigkeit zu rang -> Beobachtung
-3.3 @plot anzahl wörter zu häufigkeit
+ 3.3 @plot anzahl wörter zu häufigkeit
 
 A4:
-4.1 Programm auf Buchstaben umschreiben
-4.2 Programm auf Buchstaben-Paare umschreiben
-4.3 Vergleich 2 Dokumente gleiche Sprache
-4.4 Vergleich 2 Dokumente unterschiedliche Sprache
+x4.1 Programm auf Buchstaben umschreiben
+x4.2 Programm auf Buchstaben-Paare umschreiben
+ 4.3 Vergleich 2 Dokumente gleiche Sprache
+ 4.4 Vergleich 2 Dokumente unterschiedliche Sprache
 
 
 
