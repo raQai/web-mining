@@ -175,7 +175,7 @@ def print_tuple_list(tuple_list):
   total_count = get_total_count(tuple_list)
 
   # print top
-  print("#", '\t', "total", '\t', "rel.", '\t\t', "word")
+  print(format('#', '6'), '\t' + format('abs', '6'), '\t' + format('rel.', '9'), '\t' + 'word')
 
   count = 0
   max_range = len(tuple_list)
@@ -183,8 +183,14 @@ def print_tuple_list(tuple_list):
     max_range = min(top_boundary, len(tuple_list))
 
   for x in range(0, max_range):
-    count += tuple_list[x][1]/total_count
-    print(x, '\t', tuple_list[x][1], '\t', "{:10.5f}".format(tuple_list[x][1]/total_count), '\t', tuple_list[x][0])
+    word = tuple_list[x][0]
+    abs_count = tuple_list[x][1]
+    rel_count = float(abs_count)/float(total_count)
+    count += rel_count
+
+    row = format(x, '6d') + ' \t' + format(abs_count, '6d') + ' \t' + format(rel_count, '.7f') + ' \t' + str(word)
+
+    print(row)
 
   print("sum of shown rel.:", count)
   return
@@ -199,15 +205,14 @@ def write_tuple_list(tuple_list, output_location):
 
   with open(output_location, 'w', encoding = codec) as output_fs:
     for x in range(0, max_range):
-      line = ''
       word = tuple_list[x][0]
-      abs = tuple_list[x][1]
-      rel = "{:10.5f}".format(tuple_list[x][1]/total_count)
+      abs_count = tuple_list[x][1]
+      rel_count = float(abs_count)/float(total_count)
 
-      line += str(x) + '\t' + str(abs) + '\t' + rel + '\t' + str(word) + '\n'
+      row = format(x, '6d') + ' \t' + format(abs_count, '6d') + ' \t' + format(rel_count, '.7f') + ' \t' + str(word)
 
       # write line
-      output_fs.write(line)
+      output_fs.write(row + "\n")
 
   return
 
