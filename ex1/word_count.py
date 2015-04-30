@@ -50,7 +50,7 @@ def main(argv):
         )
   except getopt.GetoptError:
     print('Please specify an input file -i <file>!')
-    print('Use -h or --help for detailed description of word_count.py.')
+    print('Try -h or --help for more information.')
     sys.exit(2)
 
   global has_input_file, file_input
@@ -93,7 +93,7 @@ def main(argv):
 
   if not has_input_file:
     print('Please specify an input file -i <file>!')
-    print('Use -h or --help for detailed description of word_count.py.')
+    print('Try -h or --help for more information.')
     sys.exit(2)
 
   # read file from input
