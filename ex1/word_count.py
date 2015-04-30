@@ -66,7 +66,7 @@ def main(argv):
 
   for opt, arg in opts:
     if opt in ("-h", "--help"):
-      with open('help.man', 'r', encoding = codec) as help_text_fs:
+      with open('word_count.man', 'r', encoding = codec) as help_text_fs:
         print(help_text_fs.read())
       sys.exit()
     elif opt in ("-i", "--input-file"):
