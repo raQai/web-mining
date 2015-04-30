@@ -10,6 +10,7 @@ CHAR = 1
 PAIR = 2
 STOPMARKS = [",", ";", ".", ":", '"', "'", "?", "!", "<", ">", "(", ")", "[", "]", "-", "_"]
 
+# GLOBALS AND FLAGS
 has_input_file = False
 file_input = ''
 
@@ -23,13 +24,11 @@ top_boundary = 0
 
 mode = WORD
 
-use_global_count = False		# if set counts stopwords to total-counts
+use_global_count = False  # if set counts stopwords to total-counts
 
-count_occurences = False		# if set counts and writes occurences of words
+count_occurences = False  # if set counts and writes occurences of words
 
-# cfg
-codec = "utf-8"				# codec of read document
-print_on_cmd = True			# if set prints results also on cmd-line
+codec = "utf-8"           # codec of read document
 
 global_words = []
 
@@ -178,9 +177,7 @@ def print_tuple_list(tuple_list):
   print(format('#', '6'), '\t' + format('abs', '6'), '\t' + format('rel.', '9'), '\t' + 'word')
 
   count = 0
-  max_range = len(tuple_list)
-  if top_boundary > 0:
-    max_range = min(top_boundary, len(tuple_list))
+  max_range = min(top_boundary, len(tuple_list)) if (top_boundary > 0) else len(tuple_list)
 
   for x in range(0, max_range):
     word = tuple_list[x][0]
@@ -195,13 +192,11 @@ def print_tuple_list(tuple_list):
   print("sum of shown rel.:", count)
   return
 
-### WRITES THE TUPLE LIST TO THE output_file FILE
+### WRITES THE TUPLE LIST TO THE output file stream
 def write_tuple_list(tuple_list, output_location):
   total_count = get_total_count(tuple_list)
 
-  max_range = len(tuple_list)
-  if top_boundary > 0:
-    max_range = min(top_boundary, len(tuple_list))
+  max_range = min(top_boundary, len(tuple_list)) if (top_boundary > 0) else len(tuple_list)
 
   with open(output_location, 'w', encoding = codec) as output_fs:
     for x in range(0, max_range):
@@ -289,6 +284,7 @@ def count_by_mode(word_list):
 
   return count
 
+### RETURNS THE TOTAL COUNT OF WORDS THAT SHOULD BE USED
 def get_total_count(tuple_list):
   total_count = 0
   if use_global_count:
@@ -329,4 +325,5 @@ def convert_tuple_list(tuple_list):
 ## call main
 if __name__ == "__main__":
   main(sys.argv[1:])
+
 ### END OF CODE
