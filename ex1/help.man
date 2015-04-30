@@ -1,0 +1,39 @@
+# # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# By René Wilmes, Christian Borg-Krebs, Patrick Bogdan
+# TU Darmstadt Web Mining - Exercise 01
+#
+# WORD COUNT
+# # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+word_count.py help
+
+-h, --help
+          Prints out this help message.
+-i <file>, --input-file <file>
+          Specifies the input file that has to be read in the programm.
+
+-o <file>, --output-file <file>
+          Specifies where the output should be written.
+          If no output file is specified, the output will be printed in the console.
+
+-s <file>, --stopwords <file>
+          Applies a stop word filter to the programm.
+
+-n <val>, --top-words <val>
+          Limits the output to <val> entries.
+
+-w, --word
+          Changes the evaluation mode to words.
+
+-c, --char
+          Changes the evaluation mode to single characters.
+
+-p, --pair
+          Changes the evaluation mode to character pairs.
+
+--gc, --use-global-count
+          Determines whether stop words are left out or implemented into the relative occurence calculation.
+          Set this flag to use all words of the document.
+
+--occ, --count-occurences
+          Adds calculation for occurence mode (described in Task 3.2)
