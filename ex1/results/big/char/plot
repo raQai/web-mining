@@ -1,20 +1,32 @@
 set terminal png large
-set output "plot_abs.png"
 set grid
-set title "Ranked words by their occurence"
+set title "Buchstaben sortiert nach ihrer Häufigkeit"
 set style fill solid border -1
 set boxwidth 0.1
 set key opaque
-set xlabel "rank"
-set ylabel "absolute occurence"
+
+set output "plot_abs.png"
+set xlabel "Rang"
+set ylabel "absolute Häufigkeit"
 plot "acres" using 1:2 with linespoint lt 1 lw 1 title "acres", "lili" using 1:2 with linespoint lt 2 lw 1 title "liliom", "jeder" using 1:2 with linespoint lt 3 lw 1 title "jedermann", "geschw" using 1:2 with linespoint lt 4 lw 1 title "geschwister", 
+
 set output "plot_rel.png"
-set ylabel "rel. occurence"
+set ylabel "relative Häufigkeit"
 plot "acres" using 1:3 with linespoint lt 1 lw 1 title "acres", "lili" using 1:3 with linespoint lt 2 lw 1 title "liliom", "jeder" using 1:3 with linespoint lt 3 lw 1 title "jedermann", "geschw" using 1:3 with linespoint lt 4 lw 1 title "geschwister", 
-set ylabel "log(occurence)"
+
+set ylabel "log(abs. Häufigkeit)"
 set logscale y
-set output "plot_abs_log.png"
+set output "plot_abs_log_y.png"
 plot "acres" using 1:2 with linespoint lt 1 lw 1 title "acres", "lili" using 1:2 with linespoint lt 2 lw 1 title "liliom", "jeder" using 1:2 with linespoint lt 3 lw 1 title "jedermann", "geschw" using 1:2 with linespoint lt 4 lw 1 title "geschwister", 
-set ylabel "log(rel. occurence)"
-set output "plot_rel_log.png"
+
+set ylabel "log(rel. Häufigkeit)"
+set output "plot_rel_log_y.png"
+plot "acres" using 1:3 with linespoint lt 1 lw 1 title "acres", "lili" using 1:3 with linespoint lt 2 lw 1 title "liliom", "jeder" using 1:3 with linespoint lt 3 lw 1 title "jedermann", "geschw" using 1:3 with linespoint lt 4 lw 1 title "geschwister", 
+
+set xlabel "log(Rang)"
+set logscale xy
+set output "plot_abs_log_xy.png"
+plot "acres" using 1:2 with linespoint lt 1 lw 1 title "acres", "lili" using 1:2 with linespoint lt 2 lw 1 title "liliom", "jeder" using 1:2 with linespoint lt 3 lw 1 title "jedermann", "geschw" using 1:2 with linespoint lt 4 lw 1 title "geschwister", 
+
+set output "plot_rel_log_xy.png"
 plot "acres" using 1:3 with linespoint lt 1 lw 1 title "acres", "lili" using 1:3 with linespoint lt 2 lw 1 title "liliom", "jeder" using 1:3 with linespoint lt 3 lw 1 title "jedermann", "geschw" using 1:3 with linespoint lt 4 lw 1 title "geschwister", 
