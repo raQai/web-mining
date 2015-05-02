@@ -98,19 +98,19 @@ def main(argv):
   return
 
 ### REMOVES STOPWORDS FROM GIVEN LIST
-def remove_stopwords(words):
+def remove_stopwords(word_list):
   with open(file_stopwords, 'r', encoding = codec) as stopword_fs:
     stopwords = stopword_fs.read()
 
+    buff = list(word_list)
     rem_counter = 0
     for stopword in stopwords.split():
-      while stopword in words:
-        rem_counter += 1
-        words.remove(stopword)
+      rem_counter += buff.count(stopword)
+      buff = [w for w in buff if w != stopword]
 
     print("removed stopwords:", rem_counter)
 
-  return words
+  return buff
 
 ### PRINTS THE FIRST i ITEMS
 def print_tuple_list(tuple_list):
