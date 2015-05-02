@@ -3,6 +3,7 @@
 import sys
 import getopt
 import fileinput
+from collections import Counter
 
 # const
 WORD = 0
@@ -62,8 +63,17 @@ def main(argv):
     if(has_stopwords):
       words = remove_stopwords(words)
 
-    # sort and filter
-    unique_word_tuples = create_tuple_list(words)
+    # changes list format based on mode
+    item_list = create_item_list(words)
+    
+    # create counter for item list
+    word_collection_counter = Counter(item_list)
+
+    # sort and apply top boundary
+    if (top_boundary > 0):
+      unique_word_tuples = word_collection_counter.most_common(top_boundary)
+    else:
+      unique_word_tuples = word_collection_counter.most_common()
 
     print("unique words:", len(unique_word_tuples))
 
@@ -119,20 +129,21 @@ def print_tuple_list(tuple_list):
   # print top
   print(format('#', '6'), '\t' + format('abs', '6'), '\t' + format('rel.', '9'), '\t' + 'word')
 
-  count = 0
-  max_range = min(top_boundary, len(tuple_list)) if (top_boundary > 0) else len(tuple_list)
+  sum_rel = 0
+  counter = 1
 
-  for x in range(0, max_range):
-    word = tuple_list[x][0]
-    abs_count = tuple_list[x][1]
+  for word_tuple in tuple_list:
+    word = word_tuple[0]
+    abs_count = word_tuple[1]
     rel_count = float(abs_count)/float(total_count)
-    count += rel_count
+    sum_rel += rel_count
 
-    row = format(x, '6d') + ' \t' + format(abs_count, '6d') + ' \t' + format(rel_count, '.7f') + ' \t' + str(word)
+    row = format(counter, '6d') + ' \t' + format(abs_count, '6d') + ' \t' + format(rel_count, '.7f') + ' \t' + str(word)
+    counter += 1
 
     print(row)
 
-  print("sum of shown rel.:", count)
+  print("sum of shown rel.:", sum_rel)
   return
 
 ### WRITES THE TUPLE LIST TO THE output file stream
@@ -142,44 +153,21 @@ def write_tuple_list(tuple_list, output_location):
   max_range = min(top_boundary, len(tuple_list)) if (top_boundary > 0) else len(tuple_list)
 
   with open(output_location, 'w', encoding = codec) as output_fs:
-    for x in range(0, max_range):
-      word = tuple_list[x][0]
-      abs_count = tuple_list[x][1]
+
+    counter = 1
+
+    for word_tuple in tuple_list:
+      word = word_tuple[0]
+      abs_count = word_tuple[1]
       rel_count = float(abs_count)/float(total_count)
 
-      row = format(x, '6d') + ' \t' + format(abs_count, '6d') + ' \t' + format(rel_count, '.7f') + ' \t' + str(word)
+      row = format(counter, '6d') + ' \t' + format(abs_count, '6d') + ' \t' + format(rel_count, '.7f') + ' \t' + str(word)
+      counter += 1
 
       # write line
       output_fs.write(row + "\n")
 
   return
-
-### COUNTS UNIQUE WORDS AND RETURNS A LIST OF TUPLES
-def create_tuple_list(word_list):
-  unique_items = []
-  item_counter = []
-
-  item_list = create_item_list(word_list)
-
-  # filter words
-  for item in item_list:
-    if item not in unique_items:
-      unique_items.append(item)
-      item_counter.append(1)
-    else:
-      index = unique_items.index(item)
-      item_counter[index] += 1
-
-  # create tuple words
-  tuple_items = []
-  for i in range(len(unique_items)):
-    tuple_items.append((unique_items[i], item_counter[i]))
-
-  # sort words
-  tuple_items = sorted(tuple_items, key=lambda x: x[1], reverse=True)
-
-  # return sorted tuple words (word w, count(w))
-  return tuple_items
 
 ### CREATES LIST OF WORD, PAIR OR CHAR ITEMS BASED ON MODE
 def create_item_list(word_list):
