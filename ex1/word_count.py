@@ -36,64 +36,7 @@ global_words = []
 ### MAIN FUNCTION
 ###
 def main(argv):
-  len_var = len(sys.argv)
-
-  try:
-    opts, args = getopt.getopt(
-        argv,
-        "hi:o:s:n:wcp",
-        ["help",
-          "input-file=","output-file=","stopwords=","top-words=",
-          "word","char","pair",
-          "use-global-count", "gc", "count-occurences", "occ"]
-        )
-  except getopt.GetoptError:
-    print('Please specify an input file -i <file>!')
-    print('Try -h or --help for more information.')
-    sys.exit(2)
-
-  global has_input_file, file_input
-  global file_input
-  global has_output_file
-  global file_output
-  global has_stopwords
-  global file_stopwords
-  global top_boundary
-  global mode
-  global use_global_count
-  global count_occurences
-
-  for opt, arg in opts:
-    if opt in ("-h", "--help"):
-      with open('word_count.man', 'r', encoding = codec) as help_text_fs:
-        print(help_text_fs.read())
-      sys.exit()
-    elif opt in ("-i", "--input-file"):
-      has_input_file = True
-      file_input = arg
-    elif opt in ("-o", "--output-file"):
-      has_output_file = True
-      file_output = arg
-    elif opt in ("-s", "--stopwords"):
-      has_stopwords = True
-      file_stopwords = arg
-    elif opt in ("-n", "--top-words"):
-      top_boundary = int(arg)
-    elif opt in ("-w", "--word"):
-      mode = WORD
-    elif opt in ("-c", "--char"):
-      mode = CHAR
-    elif opt in ("-p", "--pair"):
-      mode = PAIR
-    elif opt in ("--gc", "--use-global-count"):
-      use_global_count = True
-    elif opt in ("--occ", "--count-occurences"):
-      count_occurences = True
-
-  if not has_input_file:
-    print('Please specify an input file -i <file>!')
-    print('Try -h or --help for more information.')
-    sys.exit(2)
+  setup_word_counter(argv)
 
   # read file from input
   with open(file_input, 'r', encoding = codec) as input_fs:
@@ -304,6 +247,62 @@ def convert_tuple_list(tuple_list):
 
   # return
   return tuple_items
+
+def setup_word_counter(argv):
+  try:
+    opts, args = getopt.getopt(
+        argv,
+        "hi:o:s:n:wcp",
+        ["help",
+          "input-file=","output-file=","stopwords=","top-words=",
+          "word","char","pair",
+          "use-global-count", "gc", "count-occurences", "occ"]
+        )
+  except getopt.GetoptError:
+    print('Please specify an input file -i <file>!')
+    print('Try -h or --help for more information.')
+    sys.exit(2)
+
+  global has_input_file, file_input
+  global has_output_file, file_output
+  global has_stopwords, file_stopwords
+  global top_boundary
+  global mode
+  global use_global_count
+  global count_occurences
+
+  for opt, arg in opts:
+    if opt in ("-h", "--help"):
+      with open('word_count.man', 'r', encoding = codec) as help_text_fs:
+        print(help_text_fs.read())
+      sys.exit()
+    elif opt in ("-i", "--input-file"):
+      has_input_file = True
+      file_input = arg
+    elif opt in ("-o", "--output-file"):
+      has_output_file = True
+      file_output = arg
+    elif opt in ("-s", "--stopwords"):
+      has_stopwords = True
+      file_stopwords = arg
+    elif opt in ("-n", "--top-words"):
+      top_boundary = int(arg)
+    elif opt in ("-w", "--word"):
+      mode = WORD
+    elif opt in ("-c", "--char"):
+      mode = CHAR
+    elif opt in ("-p", "--pair"):
+      mode = PAIR
+    elif opt in ("--gc", "--use-global-count"):
+      use_global_count = True
+    elif opt in ("--occ", "--count-occurences"):
+      count_occurences = True
+
+  if not has_input_file:
+    print('Please specify an input file -i <file>!')
+    print('Try -h or --help for more information.')
+    sys.exit(2)
+
 
 ## call main
 if __name__ == "__main__":
