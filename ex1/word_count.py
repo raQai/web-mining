@@ -113,6 +113,7 @@ def print_tuple_list(tuple_list):
 
   # print top
   print(format('#', '6'), '\t' + format('abs', '6'), '\t' + format('rel.', '9'), '\t' + 'word')
+  print('------------------------------------------------')
 
   sum_rel = 0
   counter = 1
