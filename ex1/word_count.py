@@ -269,18 +269,17 @@ def create_pair_list(word_list):
 
 ### RETURNS ITEM COUNT DEPENDING ON MODE
 def count_by_mode(word_list):
-  count = 0
+
   if(mode == WORD):
     count = len(word_list)
   if(mode == PAIR):
+    count = 0
     for word in word_list:
       if len(word) > 1:
-        for i in range(0,len(word)-1):
-          count += 1
+        count += len(word)-1
   if(mode == CHAR):
-    for word in word_list:
-      for char in word:
-        count += 1
+    # creates a string without separator of all words in word_list
+    count = len("".join(word_list))
 
   return count
 
