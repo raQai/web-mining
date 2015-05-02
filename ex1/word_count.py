@@ -71,7 +71,7 @@ def main(argv):
 
     # sort and apply top boundary
     if (top_boundary > 0):
-      unique_word_tuples = word_collection_counter.most_common(top_boundary)
+      unique_word_tuples = word_collection_counter.most_common(min(top_boundary, len(word_collection_counter)))
     else:
       unique_word_tuples = word_collection_counter.most_common()
 
