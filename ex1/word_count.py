@@ -216,13 +216,7 @@ def create_tuple_list(word_list):
   unique_items = []
   item_counter = []
 
-  if(mode == WORD):
-    item_list = create_word_list(word_list)
-  if(mode == CHAR):
-    item_list = create_char_list(word_list)
-  if(mode == PAIR):
-    item_list = create_pair_list(word_list)
-
+  item_list = create_item_list(word_list)
 
   # filter words
   for item in item_list:
@@ -244,32 +238,22 @@ def create_tuple_list(word_list):
   # return sorted tuple words (word w, count(w))
   return tuple_items
 
-### CEATES LIST OF WORDS
-def create_word_list(word_list):
-  return word_list
-
-### CREATES LIST OF CHARS
-def create_char_list(word_list):
-  buff = []
-  for word in word_list:
-    for char in word:
-      buff.append(char)
-
-  return buff
-
-### CREATES LIST OF PAIRS
-def create_pair_list(word_list):
-  buff = []
-  for word in word_list:
-    if len(word) > 1:
-      for i in range(0,len(word)-1):
-        buff.append(word[i:i+2])
-
-  return buff
+### CREATES LIST OF WORD, PAIR OR CHAR ITEMS BASED ON MODE
+def create_item_list(word_list):
+  if mode == PAIR:
+    buff = []
+    for word in word_list:
+      if len(word) > 1:
+        for i in range(0,len(word)-1):
+          buff.append(word[i:i+2])
+    return buff
+  elif mode == CHAR:
+    return list("".join(word_list))
+  else:
+    return word_list
 
 ### RETURNS ITEM COUNT DEPENDING ON MODE
 def count_by_mode(word_list):
-
   if(mode == WORD):
     count = len(word_list)
   if(mode == PAIR):
