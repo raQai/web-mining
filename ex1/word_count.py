@@ -33,9 +33,9 @@ codec = "utf-8"           # codec of read document
 
 global_words = []
 
-###
-### MAIN FUNCTION
-###
+"""
+MAIN FUNCTION
+"""
 def main(argv):
   setup_word_counter(argv)
 
@@ -87,6 +87,7 @@ def main(argv):
     # if count occurences
     if count_occurences:
       # set global count false for occurences output
+      global use_global_count
       temp = use_global_count
       use_global_count = False
 
@@ -101,28 +102,12 @@ def main(argv):
       else:
         write_tuple_list(occ_tuple, file_output + '_occ.txt')
 
-      # re-set flag
-      use_global_count = temp
-
   sys.exit()
-  return
 
-### REMOVES STOPWORDS FROM GIVEN LIST
-def remove_stopwords(word_list):
-  with open(file_stopwords, 'r', encoding = codec) as stopword_fs:
-    stopwords = stopword_fs.read()
-
-    buff = list(word_list)
-    rem_counter = 0
-    for stopword in stopwords.split():
-      rem_counter += buff.count(stopword)
-      buff = [w for w in buff if w != stopword]
-
-    print("removed stopwords:", rem_counter)
-
-  return buff
-
-### PRINTS THE FIRST i ITEMS
+"""
+OUTPUT FUNCTIONS
+"""
+# PRINTS RESULTS TO CONSOLE WINDOW
 def print_tuple_list(tuple_list):
   total_count = get_total_count(tuple_list)
 
@@ -138,15 +123,14 @@ def print_tuple_list(tuple_list):
     rel_count = float(abs_count)/float(total_count)
     sum_rel += rel_count
 
-    row = format(counter, '6d') + ' \t' + format(abs_count, '6d') + ' \t' + format(rel_count, '.7f') + ' \t' + str(word)
+    row = create_format_string(counter, abs_count, rel_count, word)
     counter += 1
 
     print(row)
 
   print("sum of shown rel.:", sum_rel)
-  return
 
-### WRITES THE TUPLE LIST TO THE output file stream
+# WRITES THE TUPLE LIST TO THE OUTPUT FILE STREAM
 def write_tuple_list(tuple_list, output_location):
   total_count = get_total_count(tuple_list)
 
@@ -161,15 +145,38 @@ def write_tuple_list(tuple_list, output_location):
       abs_count = word_tuple[1]
       rel_count = float(abs_count)/float(total_count)
 
-      row = format(counter, '6d') + ' \t' + format(abs_count, '6d') + ' \t' + format(rel_count, '.7f') + ' \t' + str(word)
+      row = create_format_string(counter, abs_count, rel_count, word)
       counter += 1
 
-      # write line
+      # write line to file
       output_fs.write(row + "\n")
 
-  return
+  print("output written to", output_location)
 
-### CREATES LIST OF WORD, PAIR OR CHAR ITEMS BASED ON MODE
+"""
+GENERAL HELPER FUNCTIONS FOR COUNTING, APPLYING FILTERS AND FORMATTING
+"""
+# REMOVES STOPWORDS FROM GIVEN LIST
+def remove_stopwords(word_list):
+  with open(file_stopwords, 'r', encoding = codec) as stopword_fs:
+    stopwords = stopword_fs.read()
+
+    rem_counter = 0
+    for stopword in stopwords.split():
+      rem_counter += word_list.count(stopword)
+      word_list = [w for w in word_list if w != stopword]
+
+    print("removed stopwords:", rem_counter)
+  return word_list
+
+def create_format_string(counter, abs_count, rel_count, word):
+  out = format(counter, '6d')
+  out += ' \t' + format(abs_count, '6d')
+  out += ' \t' + format(rel_count, '.7f')
+  out += ' \t' + str(word)
+  return out
+
+# CREATES LIST OF WORD, PAIR OR CHAR ITEMS BASED ON MODE
 def create_item_list(word_list):
   if mode == PAIR:
     buff = []
@@ -183,7 +190,18 @@ def create_item_list(word_list):
   else:
     return word_list
 
-### RETURNS ITEM COUNT DEPENDING ON MODE
+# RETURNS THE TOTAL COUNT OF WORDS THAT SHOULD BE USED
+def get_total_count(tuple_list):
+  total_count = 0
+  if use_global_count:
+    total_count = count_by_mode(global_words)
+  else:
+    for item in tuple_list:
+      total_count += item[1]
+
+  return total_count
+
+# RETURNS ITEM COUNT DEPENDING ON MODE
 def count_by_mode(word_list):
   if(mode == WORD):
     count = len(word_list)
@@ -195,22 +213,9 @@ def count_by_mode(word_list):
   if(mode == CHAR):
     # creates a string without separator of all words in word_list
     count = len("".join(word_list))
-
   return count
 
-### RETURNS THE TOTAL COUNT OF WORDS THAT SHOULD BE USED
-def get_total_count(tuple_list):
-  total_count = 0
-  if use_global_count:
-    total_count = count_by_mode(global_words)
-  else:
-    for item in tuple_list:
-      total_count += item[1]
-
-  return total_count
-
-
-### CONVERTS TUPLE-LIST (word, occurence) TO TUPLE-LIST (occurence, sum(words with occ))
+# CONVERTS TUPLE-LIST (word, occurence) TO TUPLE-LIST (occurence, sum(words with occ))
 def convert_tuple_list(tuple_list):
   buff = []
 
@@ -233,7 +238,6 @@ def convert_tuple_list(tuple_list):
   # sort words
   tuple_items = sorted(tuple_items, key=lambda x: x[0])
 
-  # return
   return tuple_items
 
 def setup_word_counter(argv):
@@ -291,9 +295,9 @@ def setup_word_counter(argv):
     print('Try -h or --help for more information.')
     sys.exit(2)
 
-
-## call main
+"""
+MAIN CALL TO RUN WORD_COUNT.PY
+"""
 if __name__ == "__main__":
   main(sys.argv[1:])
 
-### END OF CODE
