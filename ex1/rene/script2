@@ -1,8 +1,0 @@
-set terminal png large
-set output "plot1_log.png"
-set grid
-set title "Worte-Häufigkeit"
-set style fill solid border -1
-set boxwidth 0.1
-set key opaque
-plot "test.txt" using 1:6 with linespoint lt 1 lw 1 title "Die Geschwister 2x log", "test.txt" using 1:5 with linespoint lt 1 lw 1 title "Die Geschwister 1x log"
