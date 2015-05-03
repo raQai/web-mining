@@ -65,15 +65,9 @@ def main(argv):
 
     # changes list format based on mode
     item_list = create_item_list(words)
-    
-    # create counter for item list
-    word_collection_counter = Counter(item_list)
 
-    # sort and apply top boundary
-    if (top_boundary > 0):
-      unique_word_tuples = word_collection_counter.most_common(min(top_boundary, len(word_collection_counter)))
-    else:
-      unique_word_tuples = word_collection_counter.most_common()
+    # create tuple list with occurence count of unique word
+    unique_word_tuples = create_tuple_list(item_list)
 
     print("unique words:", len(unique_word_tuples))
 
@@ -92,7 +86,8 @@ def main(argv):
       use_global_count = False
 
       # calculate occurences tuple
-      occ_tuple = convert_tuple_list(unique_word_tuples)
+      occ_list = [count for word, count in unique_word_tuples]
+      occ_tuple = create_tuple_list(occ_list)
 
       # print
       if not has_output_file:
@@ -109,23 +104,24 @@ OUTPUT FUNCTIONS
 """
 # PRINTS RESULTS TO CONSOLE WINDOW
 def print_tuple_list(tuple_list):
-  total_count = get_total_count(tuple_list)
-
-  # print top
+  # print header
   print(format('#', '6'), '\t' + format('abs', '6'), '\t' + format('rel.', '9'), '\t' + 'word')
   print('------------------------------------------------')
 
   sum_rel = 0
-  counter = 1
 
-  for word_tuple in tuple_list:
-    word = word_tuple[0]
-    abs_count = word_tuple[1]
-    rel_count = float(abs_count)/float(total_count)
+  total_count = get_total_count(tuple_list)
+  if (top_boundary > 0):
+    max_display = min(top_boundary, len(tuple_list))
+  else:
+    max_display = len(tuple_list)
+
+  for i in range(max_display):
+    (word, count) = tuple_list[i]
+    rel_count = float(count)/float(total_count)
     sum_rel += rel_count
 
-    row = create_format_string(counter, abs_count, rel_count, word)
-    counter += 1
+    row = create_format_string(i + 1, count, rel_count, word)
 
     print(row)
 
@@ -133,21 +129,18 @@ def print_tuple_list(tuple_list):
 
 # WRITES THE TUPLE LIST TO THE OUTPUT FILE STREAM
 def write_tuple_list(tuple_list, output_location):
-  total_count = get_total_count(tuple_list)
-
-  max_range = min(top_boundary, len(tuple_list)) if (top_boundary > 0) else len(tuple_list)
-
   with open(output_location, 'w', encoding = codec) as output_fs:
+    total_count = get_total_count(tuple_list)
+    if (top_boundary > 0):
+      max_display = min(top_boundary, len(tuple_list))
+    else:
+      max_display = len(word_counter)
 
-    counter = 1
+    for i in range(max_display):
+      (word, count) = tuple_list[i]
+      rel_count = float(count)/float(total_count)
 
-    for word_tuple in tuple_list:
-      word = word_tuple[0]
-      abs_count = word_tuple[1]
-      rel_count = float(abs_count)/float(total_count)
-
-      row = create_format_string(counter, abs_count, rel_count, word)
-      counter += 1
+      row = create_format_string(i + 1, count, rel_count, word)
 
       # write line to file
       output_fs.write(row + "\n")
@@ -170,13 +163,6 @@ def remove_stopwords(word_list):
     print("removed stopwords:", rem_counter)
   return word_list
 
-def create_format_string(counter, abs_count, rel_count, word):
-  out = format(counter, '6d')
-  out += ' \t' + format(abs_count, '6d')
-  out += ' \t' + format(rel_count, '.7f')
-  out += ' \t' + str(word)
-  return out
-
 # CREATES LIST OF WORD, PAIR OR CHAR ITEMS BASED ON MODE
 def create_item_list(word_list):
   if mode == PAIR:
@@ -191,14 +177,23 @@ def create_item_list(word_list):
   else:
     return word_list
 
+# CREATES LIST OF TUPLES
+"""
+creates a collection counter of a given <item_list>
+@returns the <top_boundary> most common items as a tuple_list
+"""
+def create_tuple_list(item_list):
+  word_counter = Counter(item_list)
+  return word_counter.most_common()
+
 # RETURNS THE TOTAL COUNT OF WORDS THAT SHOULD BE USED
 def get_total_count(tuple_list):
   total_count = 0
   if use_global_count:
     total_count = count_by_mode(global_words)
   else:
-    for item in tuple_list:
-      total_count += item[1]
+    for word, count in tuple_list:
+      total_count += count
 
   return total_count
 
@@ -216,30 +211,12 @@ def count_by_mode(word_list):
     count = len("".join(word_list))
   return count
 
-# CONVERTS TUPLE-LIST (word, occurence) TO TUPLE-LIST (occurence, sum(words with occ))
-def convert_tuple_list(tuple_list):
-  buff = []
-
-  unique_occurences = []
-  item_counter = []
-
-  for tuple in tuple_list:
-    if tuple[1] in unique_occurences:
-      index = unique_occurences.index(tuple[1])
-      item_counter[index] += 1
-    else:
-      unique_occurences.append(tuple[1])
-      item_counter.append(1)
-
-  # create tuple occ
-  tuple_items = []
-  for i in range(len(unique_occurences)):
-    tuple_items.append((unique_occurences[i], item_counter[i]))
-
-  # sort words
-  tuple_items = sorted(tuple_items, key=lambda x: x[0])
-
-  return tuple_items
+def create_format_string(counter, abs_count, rel_count, word):
+  out = format(counter, '6d')
+  out += ' \t' + format(abs_count, '6d')
+  out += ' \t' + format(rel_count, '.7f')
+  out += ' \t' + str(word)
+  return out
 
 def setup_word_counter(argv):
   try:
