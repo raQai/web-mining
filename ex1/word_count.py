@@ -178,10 +178,6 @@ def create_item_list(word_list):
     return word_list
 
 # CREATES LIST OF TUPLES
-"""
-creates a collection counter of a given <item_list>
-@returns the <top_boundary> most common items as a tuple_list
-"""
 def create_tuple_list(item_list):
   word_counter = Counter(item_list)
   return word_counter.most_common()
@@ -211,6 +207,7 @@ def count_by_mode(word_list):
     count = len("".join(word_list))
   return count
 
+# STRING FORMAT FOR OUTPUT
 def create_format_string(counter, abs_count, rel_count, word):
   out = format(counter, '6d')
   out += ' \t' + format(abs_count, '6d')
@@ -218,6 +215,7 @@ def create_format_string(counter, abs_count, rel_count, word):
   out += ' \t' + str(word)
   return out
 
+# OPTION AND ARG HANDELING
 def setup_word_counter(argv):
   try:
     opts, args = getopt.getopt(
