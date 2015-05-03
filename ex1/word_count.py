@@ -134,7 +134,7 @@ def write_tuple_list(tuple_list, output_location):
     if (top_boundary > 0):
       max_display = min(top_boundary, len(tuple_list))
     else:
-      max_display = len(word_counter)
+      max_display = len(tuple_list)
 
     for i in range(max_display):
       (word, count) = tuple_list[i]
