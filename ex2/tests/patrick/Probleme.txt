@@ -1,0 +1,12 @@
+- Webside erkennt welcher Browser genutzt wird (ggf. für Python keinen zugriff da Bot)
+- Join Relative Links 
+- defrag Fragmente / Parameter
+- Time 
+- Host braucht zu lange
+- Exception handling
+
+
+
+To Do
+- Exception Handling
+- Breitensuche

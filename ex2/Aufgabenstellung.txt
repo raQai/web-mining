@@ -1,0 +1,35 @@
+ Suchmaschinen
+
+    (3 Punkte) Entwickeln Sie auf der Basis der in Übungsblatt 1, Aufgabe 4 herausgefundenen Statistiken über Sprachen ein einfaches Verfahren, mit dem es möglich ist, die Sprache eines Textes anhand der Häufigkeiten von Buchstaben und Buchstabenpaaren vorherzusagen. 
+    Implementieren Sie ein Programm, das durch Verwendung Ihres Verfahrens in der Lage ist, die Sprache (Deutsch - Englisch - Spanisch) einer Web-Seite zu ermitteln. Das Programm soll dabei nicht fähig sein, zu lernen. Sie sollen Ihr Sprachenmodell sozusagen in die Funktion hardcoden.
+        Erklären Sie kurz ihr Verfahren z.B. auch mittels Pseudocode.
+        Gehen Sie auf http://www.ke.tu-darmstadt.de/lehre/ss15/web-mining/u2languagechallenge.html  und ermitteln Sie die Sprache der 10 dort erhältlichen Webseiten. Die ersten Fünf erhalten nur eine Liste von Buchstaben, die letzten 5 Buchstabenpaare. Schreiben für jeden Text das Ergebnis zeilenweise in eine Datei namens challenge.txt im Format "Seitennummer Sprache\n". Bedenken Sie für die ersten 5 Seiten, daß Ihr Verfahren auch funktionieren soll, falls nur Buchstaben und keine Buchstabenpaare vorliegen.
+    (5 Punkte) Schreiben Sie einen ein­fachen Crawler. Die in der Vor­lesung be­han­del­ten Ver­fahren zur Op­ti­mierung brauchen Sie dabei nicht zu berücksichtigen. Der Crawler sollte
+        keine URLs dop­pelt be­suchen, d.h. Sie soll­ten URLs kanon­isieren,
+        die Serv­er nicht zu sehr in Anspruch nehmen, z.B. könnten Sie den Bot nach jedem Re­quest auf dem gleichen Host eine kurze Pause machen lassen,
+        eine randomisierte Breadth-First-Strategie verfolgen, d.h. neue Links werden hinten in die Queue einsortiert, aber der nächste anzusteuernde Link wird zufällig gewählt,
+        Zähler führen, die die Auf­stel­lung fol­gen­der Statis­tiken er­lauben:
+        Er­stellen Sie ein His­togramm über die An­zahl der URLs pro Seite (wie beim er­sten Übungs­blatt mit den Worthäufigkeit­en, auch log­a­rith­misch).
+        Er­stellen Sie ein His­togramm mit den Häufigkeit­en des Auftretens von Hy­per­links (d.h., wie viele Links treten 1-mal auf, wie viele 2-mal, ...).
+        Überlegen Sie sich ein einfaches Verfahren, um Duplikate festzustellen, und beschreiben Sie es. Das Verfahren sollte dabei z.B. Datenbank-generierte Seiten, bei der sich nur kurze Passagen wie Zeitangaben, Navigationsleisten, Werbeeinblendungen unterscheiden, als Duplikate erkennen. Wenden Sie ihr Verfahren nachträglich auf die heruntergeladenen Seiten an und ermitteln Sie die Anzahl der gefundenen Duplikate. Verifizieren Sie Ihr Verfahren stichprobenartig und zeigen Sie ein repräsentatives Beispiel auf.
+        Verwenden Sie Ihr Verfahren aus der ersten Teilaufgabe, um die Sprache der heruntergeladenen Seiten zu ermitteln. Geben Sie die Verteilung über die gefundenen Sprachen an.
+        Schreiben Sie auch eine kurze Zusam­men­fas­sung über Ihre Er­fahrun­gen bzw. etwaige Prob­leme mit dieser Auf­gabe.
+
+Starten Sie den Crawler an einer Seite Ihrer Wahl, lassen Sie ihn eine Weile (zu­min­d­est 1000 Seit­en) laufen und er­stellen Sie die genan­nten Statis­tiken.
+
+3. (2 Punkte) Wenden Sie Ihren Crawler ein weiteres Mal an mit der (oder die) gleichen Startseite(n). Priorisieren Sie diesmal die Seiten in der Queue der Breadth-First-Suche nach der Zugehörigkeit zu einer Sprache. Benutzen Sie also Ihr Tool aus Aufgabe 1, suchen Sie sich eine Sprache aus, auf der Sie den Crawl fokussieren wollen, und benutzen Sie die berechnete Konfidenz der Zuordnung zu dieser Sprache um die Liste der offenen URLs zu ordnen.
+Lassen Sie sich wieder die Histogramme wie in Teilaufgabe 2.1 und 2.2 ausgeben und vergleichen Sie mit diesen. Betrachten Sie insbesondere auch die Verteilung über die gefundenen Sprachen.
+
+4. (2 Punkte) Schätzen Sie mit der in der Vor­lesung ken­nen­gel­ern­ten Meth­ode die Größe des Webs einer von Ihnen ausgesuchten Sprache an­hand des Such-Over­laps zweier Such­maschi­nen ab (die zu­grun­deliegen­den Queries soll­ten eine überschaubare aber nicht zu kleine An­zahl von Tr­e­f­fern re­tournieren). Erscheint Ihnen die Größe plausibel, insbesondere im Vergleich zu der unter www.?worldwidewebsize.?com geschätzten Gesamtgröße des Webs?
+
+Für eine ko­r­rek­te Abschätzung brauchen Sie auch eine Abschätzung der Größe des sprachspezifischen Index der ver­wen­de­ten Suchmaschine. Überlegen Sie sich auch hierfür eine geeignete Methode und beschreiben Sie diese (Vor langer Zeit war es z.?B.? möglich, in Google nach "* *" zu suchen.).?
+Hinweise
+
+    Bedenken Sie, daß ein Crawl eine beträchliche Zeit in Anspruch nehmen kann, die Sie auch nicht direkt beeinflussen können. Es ist auch nicht ungewöhnlich, daß Sie z.B. aufgrund von Problemen und Fehlerbereinigungen mehrere Anläufe benötigen. Starten Sie deshalb Ihren ersten Crawl rechtzeitig.
+    Beispiele für Duplikate aufgrund von Datenbank-generierter Seiten sind z.B. http://www.ke.tu-darmstadt.de/lehre/arbeiten vs. http://www.ke.tu-darmstadt.de/resources/eurlex/lehre/arbeiten und Aufrufe von http://www.ke.tu-darmstadt.de/bibtex/topics/single/31 oder auch http://www.ke.tu-darmstadt.de/bibtex/topics zu unterschiedlichen Zeitpunkten (unterschiedliche processing time). http://www.ke.tu-darmstadt.de/bibtex/topics/single/173 und http://www.ke.tu-darmstadt.de/bibtex/authors/show/3259 sind allerdings keine Duplikate mehr. Bedenken Sie bei Ihrem Verfahren auch, daß Sie im schlimmsten Fall mit allen bereits gecrawlten Seiten vergleichen müssen.
+    Bei den gängigsten Suchmaschinen können Sie üblicherweise die Sprache für die retournierten Webseiten festlegen.
+
+ 
+Hil­fre­iche Mod­ule:
+
+Hilfreiche Module oder Programme zum Laden von Web-Seiten sind z.B. LWP::Sim­ple (Perl), urllib (Python), zum Extrahieren von Hyperlinks HTML::LinkEx­tor (Perl), SGML­Pars­er (Beispiel), html­da­ta (Python), Kanonisieren von URLs URI (Perl), urlparser (Python), und generell zum Parsen von Web-Seiten und Extrahieren von Text BeautifulSoup, html2text (Python), HTMLDocument.getText(), html parser, Cobra (Java), html2text.pl (Perl). Sollten Sie mit diesen Tools oder mit selbst erstellten Parsern Schwierigkeiten haben, an den Text zu kommen, so können Sie auch etwas robustere externe Programme versuchen wie html2text oder die textbasierten Webbrowser links, w3m und linx, die sie zum Rendern verwenden können um anschließend die generierte rohe Textausgabe zu parsen.
