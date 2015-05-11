@@ -16,13 +16,14 @@ from collections import Counter
 from threading import Thread
 from urllib.request import urlopen, Request
 from urllib.parse import urlparse, urljoin, urldefrag
-from bs4 import BeautifulSoup, SoupStrainer
+from bs4 import BeautifulSoup
 
 link_collection = []
 unique_links = set()
 visited = set()
 history = set()
 blocked_hosts = set()
+
 boundary = 10
 observe = True
 
