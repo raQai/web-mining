@@ -10,7 +10,7 @@ STOPMARKS = [",", ";", ".", ":", '"', "'", "?", "!", "<", ">", "(", ")", "[", "]
 has_input_file = False
 file_input = ''
 
-n = 10
+n = 5
 
 pairs_flag = True
 
@@ -28,24 +28,50 @@ def main(argv):
 	text = fs.read()
 	
 	# get pairs
-	list = get_list(text, n, pairs_flag)
+	(words, total, list) = get_list(text, n, pairs_flag)
+	(words2, total2, list2) = get_list(text, n, not pairs_flag)
 	
-	# print pairs with rank and occurence
+	# print information
+	print("total amount of words:", words)
+	if(pairs_flag):
+		print("total amount of letter-pairs:", total)
+	else:
+		print("total amount of chars:", total)
+	
 	for i in range(len(list)):
 		x = list[i]
 		print(i+1, x[0], x[1], format(x[2], '.5f'))
 	
+	print("")
+	# print information
+	print("total amount of words:", words2)
+	if(not pairs_flag):
+		print("total amount of letter-pairs:", total2)
+	else:
+		print("total amount of chars:", total2)
+	
+	for i in range(len(list2)):
+		x = list2[i]
+		print(i+1, x[0], x[1], format(x[2], '.5f'))
+	
+	weight1 = total/words
+	weight2 = total2/words2
+	
+	print("weight1:", weight1, "\tweight2:", weight2)
+	
+	
+	
 	sys.exit()
 	
-# returns a list of char-pairs with syntax: (pair, abs. count, rel. count)
+# returns (total_words, total_pairs, list) where list is a list of char-pairs with syntax: (pair, abs. count, rel. count)
 def get_pairs(text, top_boundary):
 	return get_list(text, top_boundary, True)
 	
-# returns a list of chars with syntax: (char, abs. count, rel. count)
+# returns (total_words, total_chars, list) where list is a list of chars with syntax: (char, abs. count, rel. count)
 def get_chars(text, top_boundary):
 	return get_list(text, top_boundary, False)
 
-# returns a list of items with syntax: (item, abs.count, rel.count). Pairs = True for pairs-list, False for char-list.
+# returns (total_words, total_chars/pairs, list) where list is a list of items with syntax: (item, abs.count, rel.count). Pairs = True for pairs-list, False for char-list.
 def get_list(text, top_boundary, pairs):
 	# normalize
 	text = text.lower()
@@ -57,6 +83,11 @@ def get_list(text, top_boundary, pairs):
     # convert to array
 	words = text.split()
 
+	
+	leng = 0
+	for word in words:
+		leng += len(word)
+	
 	# create pair list
 	list = []
 	if pairs:
@@ -71,7 +102,7 @@ def get_list(text, top_boundary, pairs):
 	uniques_with_rel = get_tuple_list(unique_pairs, top_boundary)
 	
 	# return
-	return uniques_with_rel
+	return (len(words), len(list), uniques_with_rel)
 
 # list(word, count) -> list(word, abs. count, rel. count)
 def get_tuple_list(tuple_list, amount):
