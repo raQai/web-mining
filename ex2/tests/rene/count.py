@@ -12,7 +12,6 @@ file_input = ''
 
 n = 5
 
-pairs_flag = True
 
 """
 MAIN FUNCTION
@@ -28,31 +27,25 @@ def main(argv):
 	text = fs.read()
 	
 	# get pairs
-	(words, total, list) = get_list(text, n, pairs_flag)
-	(words2, total2, list2) = get_list(text, n, not pairs_flag)
+	(words, total, list) = get_pairs(text, n)
+	(words2, total2, list2) = get_chars(text, n)
 	
 	# print information
 	print("total amount of words:", words)
-	if(pairs_flag):
-		print("total amount of letter-pairs:", total)
-	else:
-		print("total amount of chars:", total)
+	print("total amount of chars:", total2)
+	print("total amount of letter-pairs:", total)
 	
-	for i in range(len(list)):
-		x = list[i]
-		print(i+1, x[0], x[1], format(x[2], '.5f'))
-	
-	print("")
-	# print information
-	print("total amount of words:", words2)
-	if(not pairs_flag):
-		print("total amount of letter-pairs:", total2)
-	else:
-		print("total amount of chars:", total2)
-	
+	print("- top chars -")
 	for i in range(len(list2)):
 		x = list2[i]
 		print(i+1, x[0], x[1], format(x[2], '.5f'))
+	
+	print("")
+	print("- top pairs -")
+	for i in range(len(list)):
+		x = list[i]
+		print(i+1, x[0], x[1], format(x[2], '.5f'))
+
 	
 	weight1 = total/words
 	weight2 = total2/words2
@@ -144,7 +137,7 @@ def arg_handling(argv):
 		opts, args = getopt.getopt(
 				argv,
 				"i:n:cp",
-				["input-file=", "amount=", "chars", "pairs"]
+				["input-file=", "amount="]
 				)
 	except getopt.GetoptError:
 		print('Please specify an input file -i <file>!')
@@ -153,7 +146,6 @@ def arg_handling(argv):
 	global has_input_file
 	global file_input
 	global n
-	global pairs_flag
 	
 	for opt, arg in opts:
 		if opt in ("-i", "--input-file"):
@@ -161,10 +153,6 @@ def arg_handling(argv):
 			file_input = arg
 		elif opt in ("-n"):
 			n = int(arg)
-		elif opt in ("-c"):
-			pairs_flag = False
-		elif opt in ("-p"):
-			pairs_flag = True
 			
 	if not has_input_file:
 		print('Please specify an input file -i <file>!')
