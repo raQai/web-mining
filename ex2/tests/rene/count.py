@@ -3,32 +3,29 @@
 import sys
 import getopt
 import fileinput
+import consts
 from collections import Counter
+
+
+		
+PAIRS = consts.PAIRS
+CHARS = consts.CHARS
+
 
 STOPMARKS = [",", ";", ".", ":", '"', "'", "?", "!", "<", ">", "(", ")", "[", "]", "-", "_"]
 
 has_input_file = False
 file_input = ''
 codec = "utf-8"
-n = 30
+
+# default = 36 -> amount of bigramm data for spanish language
+n = 36
 
 # CONST
 UNDEFINED = 0
 GER = 1
 ENG = 2
 SPA = 3
-
-#char, german, english, spanish
-CHARS = [
-			('a', 0.07, 0.08, 0.13), ('b', 0.02, 0.02, 0.01), ('c', 0.03, 0.03, 0.05), ('d', 0.05, 0.04, 0.06), 
-			('e', 0.17, 0.13, 0.14), ('f', 0.02, 0.02, 0.00), ('g', 0.03, 0.02, 0.01), ('h', 0.05, 0.06, 0.01), 
-			('i', 0.08, 0.07, 0.06), ('j', 0.00, 0.00, 0.00), ('k', 0.01, 0.01, 0.00), ('l', 0.03, 0.04, 0.05), 
-			('m', 0.03, 0.02, 0.03), ('n', 0.10, 0.07, 0.07), ('o', 0.03, 0.08, 0.09), ('p', 0.01, 0.02, 0.03), 
-			('q', 0.00, 0.00, 0.01), ('r', 0.07, 0.06, 0.07), ('s', 0.07, 0.06, 0.08), ('t', 0.06, 0.09, 0.05), 
-			('u', 0.04, 0.03, 0.04), ('v', 0.01, 0.01, 0.01), ('w', 0.02, 0.02, 0.00), ('x', 0.00, 0.00, 0.00), 
-			('y', 0.00, 0.02, 0.01), ('z', 0.01, 0.00, 0.01)
-		]
-				
 				
 """
 MAIN FUNCTION
@@ -85,7 +82,8 @@ def main(argv):
 		prob_eng += abs(counted_prob - get_char_prob(char, ENG))
 		prob_spa += abs(counted_prob - get_char_prob(char, SPA))
 
-	print("probabilities:", prob_ger, prob_eng, prob_spa)
+	print("char probabilities:", prob_ger, prob_eng, prob_spa)
+
 	
 	if(prob_ger < prob_eng):
 		if(prob_ger < prob_spa):
@@ -105,6 +103,47 @@ def main(argv):
 	if language == SPA:
 		print("detected language:", "spanish")
 		
+	#for i in range(len(PAIRS)):
+	#	print(PAIRS[i][0], PAIRS[i][1], PAIRS[i][2], PAIRS[i][3])	
+	
+	prob_pair_ger = 0
+	prob_pair_eng = 0
+	prob_pair_spa = 0
+
+	for i in range(len(list)):
+		
+		pair = list[i][0]
+		counted_prob = list[i][2]
+		perfect_prob = get_pair_prob(pair, GER)
+		diff_prob = abs(counted_prob - perfect_prob)
+		
+		print(pair, counted_prob, perfect_prob, diff_prob)
+		prob_pair_ger += abs(counted_prob - get_pair_prob(pair, GER))
+		prob_pair_eng += abs(counted_prob - get_pair_prob(pair, ENG))
+		prob_pair_spa += abs(counted_prob - get_pair_prob(pair, SPA))
+
+	print("pair probabilities:", prob_pair_ger, prob_pair_eng, prob_pair_spa)
+
+	
+	if(prob_pair_ger < prob_pair_eng):
+		if(prob_pair_ger < prob_pair_spa):
+			language = GER
+		else:
+			language = SPA
+	else:
+		if(prob_pair_eng < prob_pair_spa):
+			language = ENG
+		else:
+			language = SPA
+			
+	if language == GER:
+		print("detected language:", "german")
+	if language == ENG:
+		print("detected language:", "english")
+	if language == SPA:
+		print("detected language:", "spanish")	
+		
+		
 	
 		
 	sys.exit()
@@ -113,6 +152,15 @@ def main(argv):
 def get_char_prob(char, language):
 	for x in CHARS:
 		if char == x[0]:
+			return x[language]
+	return 0
+	
+# returns the probability of a given letter-pair in the given language
+def get_pair_prob(pair, language):
+	for x in PAIRS:
+		print(pair, x[0], pair == x[0])
+		if pair == x[0]:
+			print(pair, x[0], pair == x[0])
 			return x[language]
 	return 0
 	
