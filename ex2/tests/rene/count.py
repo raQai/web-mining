@@ -42,17 +42,13 @@ def main(argv):
 	
 	# read file
 	text = fs.read()
-	
-	# get pairs
-	(words, total, list) = get_pairs(text, n)
-	(words2, total2, list2) = get_chars(text, n)
-	
+
 	# detect language
 	language = detect_language(text, n)
 	
 	# print result
 	print("")
-	print("detected language:", language_to_string(language))
+	print("detected language:", language)
 	print("")
 	
 	# exit
@@ -63,7 +59,6 @@ def detect_language(text, n):
 	# get pairs
 	(words, total, pairs) = get_pairs(text, n)
 	(words2, total2, chars) = get_chars(text, n)
-	
 	
 	# sum char probabilities
 	prob_char_ger = 0
@@ -78,6 +73,7 @@ def detect_language(text, n):
 		prob_char_eng += abs(chars[i][2] - get_char_prob(char, ENG))
 		prob_char_spa += abs(chars[i][2] - get_char_prob(char, SPA))
 	
+	# detect language, lowest prob sum -> smallest distance -> best match
 	if(prob_char_ger < prob_char_eng):
 		if(prob_char_ger < prob_char_spa):
 			char_lang = GER
@@ -96,29 +92,16 @@ def detect_language(text, n):
 	prob_pair_ger = 0
 	prob_pair_eng = 0
 	prob_pair_spa = 0
-
+	
+	pair_lang = UNDEFINED
+	
 	for i in range(len(pairs)):
 		pair = pairs[i][0]
 		prob_pair_ger += abs(pairs[i][2] - get_pair_prob(pair, GER))
 		prob_pair_eng += abs(pairs[i][2] - get_pair_prob(pair, ENG))
-		prob_pair_spa += abs(pairs[i][2] - get_pair_prob(pair, SPA))
-
-
-	if(print_all):
-		print("probabilities\t", "german\t\t", "english\t", "spanish")
-		print("chars:\t",
-			"\t", format(prob_char_ger, '.5f'), 
-			"\t", format(prob_char_eng, '.5f'), 
-			"\t", format(prob_char_spa, '.5f')
-			)
-		print("pairs:\t",
-			"\t", format(prob_pair_ger, '.5f'), 
-			"\t", format(prob_pair_eng, '.5f'), 
-			"\t", format(prob_pair_spa, '.5f')
-			)
+		prob_pair_spa += abs(pairs[i][2] - get_pair_prob(pair, SPA))	
 	
-	pair_lang = UNDEFINED
-	
+	# detect language, lowest prob sum -> smallest distance -> best match
 	if(prob_pair_ger < prob_pair_eng):
 		if(prob_pair_ger < prob_pair_spa):
 			pair_lang = GER
@@ -133,8 +116,20 @@ def detect_language(text, n):
 			else:
 				pair_lang = UNDEFINED
 	
-	# print results
+	# if print, print results
 	if(print_all):
+		print("probabilities\t", "german\t\t", "english\t", "spanish")
+		print("chars:\t",
+			"\t", format(prob_char_ger, '.5f'), 
+			"\t", format(prob_char_eng, '.5f'), 
+			"\t", format(prob_char_spa, '.5f')
+			)
+		print("pairs:\t",
+			"\t", format(prob_pair_ger, '.5f'), 
+			"\t", format(prob_pair_eng, '.5f'), 
+			"\t", format(prob_pair_spa, '.5f')
+			)
+
 		if char_lang == GER:
 			print("(chars) detected language:", "german")
 		elif char_lang == ENG:
@@ -154,15 +149,18 @@ def detect_language(text, n):
 			print("(pairs) detected language:", "undefined")
 
 	
-	# easy cases
+	# return
 	if(char_lang == pair_lang):
-		return char_lang
+		return language_to_string(char_lang)
 	elif(char_lang == UNDEFINED):
-		return pair_lang
+		return language_to_string(pair_lang)
 	elif(pair_lang == UNDEFINED):
-		return char_lang
+		return language_to_string(char_lang)
 	elif(char_lang != pair_lang):
-		return pair_lang
+		return language_to_string(pair_lang)
+		
+	# default case, code should not execute here
+	return UNDEFINED
 	
 # returns a full string of the language const
 def language_to_string(language):
