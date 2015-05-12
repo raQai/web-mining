@@ -65,8 +65,7 @@ def main(argv):
 	weight2 = total2/words2
 	
 	# print("weight1:", weight1, "\tweight2:", weight2)
-	print(get_char_prob('e', SPA))
-	
+
 	prob_ger = 0
 	prob_eng = 0
 	prob_spa = 0
@@ -117,7 +116,7 @@ def main(argv):
 		perfect_prob = get_pair_prob(pair, GER)
 		diff_prob = abs(counted_prob - perfect_prob)
 		
-		print(pair, counted_prob, perfect_prob, diff_prob)
+		#print(pair, counted_prob, perfect_prob, diff_prob)
 		prob_pair_ger += abs(counted_prob - get_pair_prob(pair, GER))
 		prob_pair_eng += abs(counted_prob - get_pair_prob(pair, ENG))
 		prob_pair_spa += abs(counted_prob - get_pair_prob(pair, SPA))
@@ -143,9 +142,6 @@ def main(argv):
 	if language == SPA:
 		print("detected language:", "spanish")	
 		
-		
-	
-		
 	sys.exit()
 	
 # returns the probability of given char in the given language
@@ -157,11 +153,16 @@ def get_char_prob(char, language):
 	
 # returns the probability of a given letter-pair in the given language
 def get_pair_prob(pair, language):
-	for x in PAIRS:
-		print(pair, x[0], pair == x[0])
-		if pair == x[0]:
-			print(pair, x[0], pair == x[0])
-			return x[language]
+	char1 = pair[0]
+	char2 = pair[1]
+	index1 = ord(char1) - 97
+	index2 = ord(char2) - 97
+	
+	# calc index and return prob
+	if((0 <= index1 <= 26) and (0 <= index2 <= 26)):
+		index = 26*index1 + index2
+		return PAIRS[index][language]
+	
 	return 0
 	
 # returns (total_words, total_pairs, list) where list is a list of char-pairs with syntax: (pair, abs. count, rel. count)
@@ -177,13 +178,24 @@ def get_list(text, top_boundary, pairs):
 	# normalize
 	text = text.lower()
 	
+	# replace
+	for char in ['ö', 'ó', 'ò', 'ô']:
+		text = text.replace(char, 'o')
+	for char in ['ä', 'á', 'à', 'â']:
+		text = text.replace(char, 'a')
+	for char in ['é', 'è', 'ê']:
+		text = text.replace(char, 'e')
+	for char in ['í', 'ì', 'î', 'ï']:
+		text = text.replace(char, 'i')
+	for char in ['ü', 'ú', 'ù', 'û']:
+		text = text.replace(char, 'u')
+	
 	# remove marks
 	for char in STOPMARKS:
 		text = text.replace(char, " ")
 
     # convert to array
 	words = text.split()
-
 	
 	leng = 0
 	for word in words:
