@@ -9,18 +9,14 @@ STOPMARKS = [",", ";", ".", ":", '"', "'", "?", "!", "<", ">", "(", ")", "[", "]
 
 has_input_file = False
 file_input = ''
-
-n = 5
+codec = "utf-8"
+n = 30
 
 # CONST
 UNDEFINED = 0
 GER = 1
 ENG = 2
 SPA = 3
-
-
-LANGUAGE = UNDEFINED
-
 
 #char, german, english, spanish
 CHARS = [
@@ -42,7 +38,7 @@ def main(argv):
 	arg_handling(argv)
 	
 	# open file
-	fs = open(file_input, 'r')
+	fs = open(file_input, 'r', encoding = codec)
 	
 	# read file
 	text = fs.read()
@@ -71,24 +67,20 @@ def main(argv):
 	weight1 = total/words
 	weight2 = total2/words2
 	
-	print("weight1:", weight1, "\tweight2:", weight2)
-	
-	global LANGUAGE
-	
+	# print("weight1:", weight1, "\tweight2:", weight2)
 	print(get_char_prob('e', SPA))
 	
 	prob_ger = 0
 	prob_eng = 0
 	prob_spa = 0
 	
-	lan = UNDEFINED
+	language = UNDEFINED
 	
 	for i in range(len(list2)):
 		char = list2[i][0]
 		counted_prob = list2[i][2]
 		perfect_prob = get_char_prob(char, GER)
 		diff_prob = abs(counted_prob - perfect_prob)
-		print("test", char, "counted:", counted_prob, "perfect:", perfect_prob, "calculated diff:", abs(counted_prob - perfect_prob))
 		prob_ger += abs(counted_prob - get_char_prob(char, GER))
 		prob_eng += abs(counted_prob - get_char_prob(char, ENG))
 		prob_spa += abs(counted_prob - get_char_prob(char, SPA))
@@ -97,21 +89,23 @@ def main(argv):
 	
 	if(prob_ger < prob_eng):
 		if(prob_ger < prob_spa):
-			lan = GER
+			language = GER
 		else:
-			lan = SPA
+			language = SPA
 	else:
 		if(prob_eng < prob_spa):
-			lan = ENG
+			language = ENG
 		else:
-			lan = SPA
+			language = SPA
 			
-	if lan == GER:
+	if language == GER:
 		print("detected language:", "german")
-	if lan == ENG:
+	if language == ENG:
 		print("detected language:", "english")
-	if lan == SPA:
+	if language == SPA:
 		print("detected language:", "spanish")
+		
+	
 		
 	sys.exit()
 	
