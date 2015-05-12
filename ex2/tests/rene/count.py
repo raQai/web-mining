@@ -12,6 +12,16 @@ file_input = ''
 
 n = 5
 
+# CONST
+UNDEFINED = 0
+GER = 1
+ENG = 2
+SPA = 3
+
+
+LANGUAGE = UNDEFINED
+
+
 #char, german, english, spanish
 CHARS = [
 			('a', 0.07, 0.08, 0.13), ('b', 0.02, 0.02, 0.01), ('c', 0.03, 0.03, 0.05), ('d', 0.05, 0.04, 0.06), 
@@ -63,13 +73,54 @@ def main(argv):
 	
 	print("weight1:", weight1, "\tweight2:", weight2)
 	
+	global LANGUAGE
 	
-	print("char\t", "german\t", "english\t", "spanish")
+	print(get_char_prob('e', SPA))
 	
-	for tuple in CHARS:
-		print(tuple[0], "\t", tuple[1], "\t", tuple[2], "\t", tuple[3])
+	prob_ger = 0
+	prob_eng = 0
+	prob_spa = 0
 	
+	lan = UNDEFINED
+	
+	for i in range(len(list2)):
+		char = list2[i][0]
+		counted_prob = list2[i][2]
+		perfect_prob = get_char_prob(char, GER)
+		diff_prob = abs(counted_prob - perfect_prob)
+		print("test", char, "counted:", counted_prob, "perfect:", perfect_prob, "calculated diff:", abs(counted_prob - perfect_prob))
+		prob_ger += abs(counted_prob - get_char_prob(char, GER))
+		prob_eng += abs(counted_prob - get_char_prob(char, ENG))
+		prob_spa += abs(counted_prob - get_char_prob(char, SPA))
+
+	print("probabilities:", prob_ger, prob_eng, prob_spa)
+	
+	if(prob_ger < prob_eng):
+		if(prob_ger < prob_spa):
+			lan = GER
+		else:
+			lan = SPA
+	else:
+		if(prob_eng < prob_spa):
+			lan = ENG
+		else:
+			lan = SPA
+			
+	if lan == GER:
+		print("detected language:", "german")
+	if lan == ENG:
+		print("detected language:", "english")
+	if lan == SPA:
+		print("detected language:", "spanish")
+		
 	sys.exit()
+	
+# returns the probability of given char in the given language
+def get_char_prob(char, language):
+	for x in CHARS:
+		if char == x[0]:
+			return x[language]
+	return 0
 	
 # returns (total_words, total_pairs, list) where list is a list of char-pairs with syntax: (pair, abs. count, rel. count)
 def get_pairs(text, top_boundary):
@@ -107,13 +158,13 @@ def get_list(text, top_boundary, pairs):
 	unique_pairs = create_tuple_list(list)
 	
 	# add relative occurence
-	uniques_with_rel = get_tuple_list(unique_pairs, top_boundary)
+	uniques_with_rel = get_tuple_list(unique_pairs, top_boundary, len(list))
 	
 	# return
 	return (len(words), len(list), uniques_with_rel)
 
 # list(word, count) -> list(word, abs. count, rel. count)
-def get_tuple_list(tuple_list, amount):
+def get_tuple_list(tuple_list, amount, abs):
 	list = []
 	
 	if (amount > 0):
@@ -121,9 +172,11 @@ def get_tuple_list(tuple_list, amount):
 	else:
 		max_display = len(tuple_list)
 		
+	
+		
 	for i in range(max_display):
 		(word, abs_count) = tuple_list[i]
-		rel_count = float(abs_count)/float(len(tuple_list))
+		rel_count = float(abs_count)/float(abs)
 		
 		list.append((word, abs_count, rel_count))
 
