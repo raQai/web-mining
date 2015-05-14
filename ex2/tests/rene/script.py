@@ -10,20 +10,29 @@ from bs4 import BeautifulSoup
 
 has_input_file = False
 file_input = ''
-write_output = False
-file_output = "results.txt" 
+write_output = True
+file_output = "challenge.txt" 
 codec = "utf-8"
 
 # default = 20
 n = 20
 
-# 10 -> all pages
-max_pages = 10
+# sleep time between each request
 sleep_time = 2
 
-base_url = "https://www.ke.tu-darmstadt.de/files/lehre/ss15/web-mining/uebung2/"
-url_suffix = ".html"
 
+urls = [
+		"https://www.ke.tu-darmstadt.de/files/lehre/ss15/web-mining/uebung2/01.html",
+		"https://www.ke.tu-darmstadt.de/files/lehre/ss15/web-mining/uebung2/02.html", 
+		"https://www.ke.tu-darmstadt.de/files/lehre/ss15/web-mining/uebung2/03.html", 
+		"https://www.ke.tu-darmstadt.de/files/lehre/ss15/web-mining/uebung2/04.html",
+		"https://www.ke.tu-darmstadt.de/files/lehre/ss15/web-mining/uebung2/05.html",
+		"https://www.ke.tu-darmstadt.de/files/lehre/ss15/web-mining/uebung2/06.html",
+		"https://www.ke.tu-darmstadt.de/files/lehre/ss15/web-mining/uebung2/07.html",
+		"https://www.ke.tu-darmstadt.de/files/lehre/ss15/web-mining/uebung2/08.html",
+		"https://www.ke.tu-darmstadt.de/files/lehre/ss15/web-mining/uebung2/09.html",
+		"https://www.ke.tu-darmstadt.de/files/lehre/ss15/web-mining/uebung2/10.html"
+		]
 
 """
 MAIN FUNCTION
@@ -37,13 +46,12 @@ def main(argv):
 		output_fs = open(file_output, 'w', encoding = codec)
 	
 	# get texts from websites
-	for i in range(1, max_pages + 1):
+	counter = 1
+	for url in urls:
 		# sleep a bit between requests
-		if not i == 1:
-			time.sleep(sleep_time)
+		time.sleep(sleep_time)
 			
-		# craft url
-		url = base_url + "{:0>2d}".format(i) + url_suffix
+		# print
 		print("[REQUEST]", url)
 
 		# get web page
@@ -57,10 +65,12 @@ def main(argv):
 		# detect language
 		lang = detect.detect_language(visible_text, n)
 		
-		print("[STATUS]", "text", i, "detected:", lang)
+		print("[STATUS]", "text", counter, "detected:", lang)
 		
 		if(write_output):
-			output_fs.write(str(i) + " " + lang + "\n")
+			output_fs.write(str(counter) + " " + lang + "\n")
+			
+		counter += 1
 		
 		
 	# exit
