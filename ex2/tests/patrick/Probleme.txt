@@ -9,4 +9,7 @@
 
 To Do
 - Exception Handling
+	- URLopen Timout
+	- URLParse Exception (Falsche URL)
+	- Bautifulsoup Exception (Bild)
 - Breitensuche
