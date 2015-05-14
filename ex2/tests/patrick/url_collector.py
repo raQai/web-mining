@@ -12,101 +12,175 @@ Description : url printer
 
 import sys
 import time
+import threading
+from random import randint
 from collections import Counter
-from threading import Thread
 from urllib.request import urlopen, Request
 from urllib.parse import urlparse, urljoin, urldefrag
 from bs4 import BeautifulSoup
 
+BOUNDARY = 5
+VISITOR_COUNT = 2
+
+# multi threading locks
+lock_collect = threading.Lock()
+lock_history = threading.Lock()
+
+# can only be accessed with lock_collect
 link_collection = []
 unique_links = set()
 visited = set()
+
+# can only be accessed with lock_history
 history = set()
 blocked_hosts = set()
 
-boundary = 10
+
 observe = True
 
-def main( argv ):
-  Thread(target=observe_history).start()
-  print('-----------------------------------------')
+
+def main(argv):
+  ''' main thread '''
   start = urlparse(argv[1])
-  add_link(start.geturl())
-  print(unique_links)
-  while len(unique_links) > 0 and len(visited) < boundary:
-    next_visit = unique_links.pop()
-    if next_visit not in visited:
-      visit_url(next_visit)
+  add_link_to_collection(start.geturl())
 
-  global observe
-  observe = False
+  history_observer = historyObserver()
+  history_observer.start()
 
-  print('-----------------------------------------')
-  if len(unique_links) == 0:
-    print('Could not find more links. Links visited:', len(visited))
-  else:
-    print('Top boundary reached.')
+  threads = []
+  for i in range(VISITOR_COUNT):
+    thread = visitorThread('VISITOR ' + str(i))
+    thread.start()
+    threads.append(thread)
+  for t in threads:
+    t.join()
 
+  # stopping the history observer before ending main
+  history_observer.stop()
 
-  cnt = Counter(link_collection)
-  print('Total links collected:', len(link_collection))
-  print('Unique links collected:', len(cnt))
-  print('Unique links collected:', len(unique_links) + len(visited))
-  print('Links visited:', len(visited))
+  print_results()
+
   sys.exit()
 
-def visit_url(request_url):
-  print('-----------------------------------------')
-  print('[VISITING]', request_url)
-  request_host = strip_www(urlparse(request_url)).netloc
-  print('[HOST]', request_host)
-  print('-----------------------------------------')
-  while request_host in blocked_hosts:
-    print('[STATUS] host recently visited. waiting...')
-    time.sleep(1)
-  collect_urls(request_url)
-  visited.add(request_url)
 
-def collect_urls(request_url):
-  parsed = urlparse(request_url)
-  
-  req = Request(parsed.geturl(), headers={'User-Agent': 'Mozilla/5.0'})
+def add_link_to_collection(url):
+  unique_links.add(strip_www(url))
+  link_collection.append(strip_www(url))
 
-  print('[STATUS] requesting file')
-  with urlopen(req) as url_fs:
-    host = strip_www(parsed).netloc
-    history.add((time.time(), host))
+
+def add_link_to_history(url):
+  with lock_history:
+    host = urlparse(url).netloc
+    release = time.time() + randint(4,8)
+    print('[ HISTORY ] added', host)
+    history.add((release, host))
     blocked_hosts.add(host)
 
-    print('[STATUS] parsing content')
-    soup = BeautifulSoup(url_fs.read())
 
-    print('[STATUS] saving links')
-    for a in soup.find_all('a'):
-      if a.has_attr('href'):
-        href = a['href']
-        url, fragmet = urldefrag(href)
-        url = strip_www(urlparse(urljoin(parsed.geturl(), url))).geturl()
-        if url.endswith('/'): 
-          url = url[:-1]
-        add_link(url)
-
-def add_link(url):
-  unique_links.add(url)
-  link_collection.append(url)
-
-def strip_www(parsed_url):
+def strip_www(url):
+  parsed_url = urlparse(url)
   if parsed_url.netloc.startswith('www.'):
     parsed_url = parsed_url._replace(netloc = parsed_url.netloc[4:])
-  return parsed_url
+  return parsed_url.geturl()
 
-def observe_history():
-  while observe:
-    for host in history.copy():
-      if time.time() > host[0] + 5:
-        history.discard(host)
-        blocked_hosts.discard(host[1])
-        break
+
+def print_results():
+  cnt = Counter(link_collection)
+  print('Total links collected:', len(link_collection))
+  print('Unique links collected (Counter):', len(cnt))
+  print('Unique links collected (Sets):', len(unique_links) + len(visited))
+  print('Links visited:', len(visited))
+
+
+class visitorThread(threading.Thread):
+  def __init__(self, name):
+      super().__init__()
+      self.active = True
+      self.name = '[' + name + ']'
+
+  def run(self):
+    while self.active:
+      next_url = ''
+      with lock_collect:
+        if len(visited) >= BOUNDARY:
+          self.stop()
+          print(self.name, 'Top boundary reached. Stopping process.')
+        else:
+          next_url = self.get_next_url()
+      if next_url:
+        self.visit_url(next_url)
+
+  def get_next_url(self):
+    url = ''
+    if len(unique_links) >= 1:
+      next_url = unique_links.pop()
+      if next_url not in visited:
+        url = next_url
+    return url
+
+  def visit_url(self, request_url):
+    print(self.name, 'visiting ', request_url)
+    request_host = urlparse(request_url).netloc
+    print(self.name, 'checking host', request_host)
+    host_blocked = True
+    while host_blocked:
+      with lock_history:
+        if request_host not in blocked_hosts:
+          host_blocked = False
+      print(self.name, 'host recently visited. waiting...')
+      time.sleep(2)
+
+    self.process_url(request_url)
+
+  def process_url(self, request_url):
+    # TODO: randomize agent
+    req = Request(request_url, headers={'User-Agent': 'Mozilla/5.0'})
+
+    print(self.name, 'requesting file')
+    with urlopen(req) as url_fs:
+      add_link_to_history(request_url)
+
+      print(self.name, 'parsing content')
+      soup = BeautifulSoup(url_fs.read())
+
+      print(self.name, 'saving links')
+      with lock_collect:
+        for a in soup.find_all('a'):
+          if a.has_attr('href'):
+            # TODO: filter images
+            href = a['href']
+            add_link_to_collection(self.clean_url(request_url, href))
+        visited.add(request_url)
+
+  def clean_url(self, base_url, url):
+    url, fragmet = urldefrag(url)
+    url = urljoin(base_url, url)
+    if url.endswith('/'):
+      url = url[:-1]
+    return url
+
+  def stop(self):
+    ''' stopping the visior thread '''
+    self.active = False
+
+
+class historyObserver(threading.Thread):
+  def __init__(self):
+    super().__init__()
+    self.active = True
+
+  def run(self):
+    while self.active:
+      with lock_history:
+        for host in history.copy():
+          if time.time() >= host[0]:
+            print('[ HISTORY ] discarding', host[1]) 
+            history.discard(host)
+            blocked_hosts.discard(host[1])
+
+  def stop(self):
+    ''' stopping the visior thread '''
+    self.active = False
 
 
 if __name__ == "__main__":
