@@ -44,7 +44,7 @@ def main(argv):
 	# open output file
 	if(write_output):
 		output_fs = open(file_output, 'w', encoding = codec)
-	
+
 	# get texts from websites
 	counter = 1
 	for url in urls:
