@@ -69,9 +69,9 @@ def detect_language(text, n):
 	
 	for i in range(len(chars)):
 		char = chars[i][0]
-		prob_char_ger += abs(chars[i][2] - get_char_prob(char, GER))
-		prob_char_eng += abs(chars[i][2] - get_char_prob(char, ENG))
-		prob_char_spa += abs(chars[i][2] - get_char_prob(char, SPA))
+		prob_char_ger += (chars[i][2] - get_char_prob(char, GER)) ** 2
+		prob_char_eng += (chars[i][2] - get_char_prob(char, ENG)) ** 2
+		prob_char_spa += (chars[i][2] - get_char_prob(char, SPA)) ** 2
 	
 	# detect language, lowest prob sum -> smallest distance -> best match
 	if(prob_char_ger < prob_char_eng):
@@ -97,9 +97,9 @@ def detect_language(text, n):
 	
 	for i in range(len(pairs)):
 		pair = pairs[i][0]
-		prob_pair_ger += abs(pairs[i][2] - get_pair_prob(pair, GER))
-		prob_pair_eng += abs(pairs[i][2] - get_pair_prob(pair, ENG))
-		prob_pair_spa += abs(pairs[i][2] - get_pair_prob(pair, SPA))	
+		prob_pair_ger += (pairs[i][2] - get_pair_prob(pair, GER)) ** 2
+		prob_pair_eng += (pairs[i][2] - get_pair_prob(pair, ENG)) ** 2
+		prob_pair_spa += (pairs[i][2] - get_pair_prob(pair, SPA)) ** 2
 	
 	# detect language, lowest prob sum -> smallest distance -> best match
 	if(prob_pair_ger < prob_pair_eng):
