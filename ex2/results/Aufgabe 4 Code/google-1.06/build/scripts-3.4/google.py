@@ -81,7 +81,7 @@ def get_page(url):
     @raise urllib2.URLError: An exception is raised on error.
     @raise urllib2.HTTPError: An exception is raised on error.
     """
-    request = Request(url)
+    request = Request(url , headers={'User-Agent': 'Mozilla/5.0'})
     request.add_header('User-Agent',
                        'Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.0)')
     cookie_jar.add_cookie_header(request)
