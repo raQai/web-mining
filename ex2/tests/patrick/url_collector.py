@@ -7,7 +7,7 @@ Author  : Patrick Bogdan
 Contact : patrick.bgdn@gmail.com
 Date    : 2015 May 10
 
-Description : url printer
+Description : url collector
 '''
 
 import sys
@@ -18,8 +18,9 @@ from collections import Counter
 from urllib.request import urlopen, Request
 from urllib.parse import urlparse, urljoin, urldefrag
 from bs4 import BeautifulSoup
+from colorama import Fore, Style
 
-BOUNDARY = 5
+BOUNDARY = 100
 VISITOR_COUNT = 2
 
 # multi threading locks
@@ -30,18 +31,21 @@ lock_history = threading.Lock()
 link_collection = []
 unique_links = set()
 visited = set()
+boundary_reached = False
 
 # can only be accessed with lock_history
 history = set()
 blocked_hosts = set()
 
 
-observe = True
-
-
 def main(argv):
   ''' main thread '''
-  start = urlparse(argv[1])
+  start_url = argv[1]
+  if not '//' in start_url:
+    start_url = 'http://' + start_url
+  start = urlparse(start_url)
+  print(start)
+
   add_link_to_collection(start.geturl())
 
   history_observer = historyObserver()
@@ -63,35 +67,6 @@ def main(argv):
   sys.exit()
 
 
-def add_link_to_collection(url):
-  unique_links.add(strip_www(url))
-  link_collection.append(strip_www(url))
-
-
-def add_link_to_history(url):
-  with lock_history:
-    host = urlparse(url).netloc
-    release = time.time() + randint(4,8)
-    print('[ HISTORY ] added', host)
-    history.add((release, host))
-    blocked_hosts.add(host)
-
-
-def strip_www(url):
-  parsed_url = urlparse(url)
-  if parsed_url.netloc.startswith('www.'):
-    parsed_url = parsed_url._replace(netloc = parsed_url.netloc[4:])
-  return parsed_url.geturl()
-
-
-def print_results():
-  cnt = Counter(link_collection)
-  print('Total links collected:', len(link_collection))
-  print('Unique links collected (Counter):', len(cnt))
-  print('Unique links collected (Sets):', len(unique_links) + len(visited))
-  print('Links visited:', len(visited))
-
-
 class visitorThread(threading.Thread):
   def __init__(self, name):
       super().__init__()
@@ -100,17 +75,27 @@ class visitorThread(threading.Thread):
 
   def run(self):
     while self.active:
-      next_url = ''
       with lock_collect:
-        if len(visited) >= BOUNDARY:
-          self.stop()
-          print(self.name, 'Top boundary reached. Stopping process.')
-        else:
-          next_url = self.get_next_url()
+        next_url = self.get_next_url()
       if next_url:
         self.visit_url(next_url)
 
   def get_next_url(self):
+    global boundary_reached
+    next_url = ''
+
+    if boundary_reached:
+      self.stop()
+      print(self.name, 'Top boundary reached. Stopping process.')
+    else:
+      # next_url will be the last item
+      # therefore setting stop flag for all visitors
+      if len(visited) >= BOUNDARY-1:
+        boundary_reached = True
+      next_url = self.pop_random_url()
+    return next_url
+
+  def pop_random_url(self):
     url = ''
     if len(unique_links) >= 1:
       next_url = unique_links.pop()
@@ -121,43 +106,40 @@ class visitorThread(threading.Thread):
   def visit_url(self, request_url):
     print(self.name, 'visiting ', request_url)
     request_host = urlparse(request_url).netloc
+
     print(self.name, 'checking host', request_host)
     host_blocked = True
     while host_blocked:
       with lock_history:
         if request_host not in blocked_hosts:
           host_blocked = False
+          add_link_to_history(request_url)
       print(self.name, 'host recently visited. waiting...')
       time.sleep(2)
 
     self.process_url(request_url)
 
+  # TODO: change for propper task processing
   def process_url(self, request_url):
-    # TODO: randomize agent
-    req = Request(request_url, headers={'User-Agent': 'Mozilla/5.0'})
+    try:
+      req = Request(request_url, headers={'User-Agent': 'Mozilla/5.0'})
 
-    print(self.name, 'requesting file')
-    with urlopen(req) as url_fs:
-      add_link_to_history(request_url)
+      print(self.name, 'requesting file')
+      with urlopen(req) as url_fs:
+        print(self.name, 'parsing content')
+        soup = BeautifulSoup(url_fs.read())
 
-      print(self.name, 'parsing content')
-      soup = BeautifulSoup(url_fs.read())
-
-      print(self.name, 'saving links')
-      with lock_collect:
-        for a in soup.find_all('a'):
-          if a.has_attr('href'):
-            # TODO: filter images
-            href = a['href']
-            add_link_to_collection(self.clean_url(request_url, href))
-        visited.add(request_url)
-
-  def clean_url(self, base_url, url):
-    url, fragmet = urldefrag(url)
-    url = urljoin(base_url, url)
-    if url.endswith('/'):
-      url = url[:-1]
-    return url
+        print(self.name, 'saving links')
+        with lock_collect:
+          for a in soup.find_all('a'):
+            if a.has_attr('href'):
+              href = a['href']
+              if not href.endswith('.png') and not href.endswith('.jpg') and not href.endswith('.pdf') and not href.endswith('.zip'):
+                add_link_to_collection(adjust_url(request_url, href))
+          visited.add(request_url)
+    except Exception:
+      print(Fore.RED + self.name, 'Exception caught, skipping', Style.RESET_ALL)
+      pass
 
   def stop(self):
     ''' stopping the visior thread '''
@@ -174,13 +156,62 @@ class historyObserver(threading.Thread):
       with lock_history:
         for host in history.copy():
           if time.time() >= host[0]:
-            print('[ HISTORY ] discarding', host[1]) 
+            print('[ HISTORY ] discarding', host[1])
             history.discard(host)
             blocked_hosts.discard(host[1])
 
   def stop(self):
     ''' stopping the visior thread '''
     self.active = False
+
+
+# TODO: adapt to excercise with different sets
+def add_link_to_collection(url):
+  unique_links.add(strip_www(url))
+  link_collection.append(strip_www(url))
+
+
+def add_link_to_history(url):
+  host = urlparse(url).netloc
+  seconds = randint(5, 10)
+  release = time.time() + seconds
+  print('[ HISTORY ] added', host, 'for', seconds, 'seconds')
+  history.add((release, host))
+  blocked_hosts.add(host)
+
+
+''' general url adjustment procedures '''
+def adjust_url(base_url, url):
+  url, fragmet = urldefrag(url)
+  url = urljoin(base_url, url)
+  if url.endswith('/'):
+    url = url[:-1]
+  return url
+
+
+def strip_www(url):
+  parsed_url = urlparse(url)
+  if parsed_url.netloc.startswith('www.'):
+    parsed_url = parsed_url._replace(netloc = parsed_url.netloc[4:])
+  return parsed_url.geturl()
+
+
+''' printing results '''
+# TODO: adapt to excercise with different sets
+def print_results():
+  cnt = Counter(link_collection)
+  print('Total links collected:', len(link_collection))
+  print('Unique links collected (Counter):', len(cnt))
+  print('Unique links collected (Sets):', len(unique_links.union(visited)))
+  print('Diff')
+  sintersect = set(cnt).intersection(unique_links.union(visited))
+  print(str(len(sintersect)), 'common links')
+  sdifference = set(cnt).symmetric_difference(unique_links.union(visited))
+  for link in sdifference:
+    print(link)
+  print(str(len(sdifference)), 'different links')
+
+  print('Links visited:', len(visited))
 
 
 if __name__ == "__main__":
