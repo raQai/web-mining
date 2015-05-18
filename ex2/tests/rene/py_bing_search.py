@@ -48,10 +48,12 @@ class PyBingSearch(object):
 		finished = False
 		nothing_counter = 0
 		while counter < limit and not finished:
-			print("searching for", query, "with top=50, skip=" + str(counter))
+			results_before = len(results)
+			print("searching for", query, "with top=50, skip=" + str(results_before))
 			before = len(self.list)
 			max = limit - len(results)
-			more_results, uri = self._search(query, 50, counter, format)
+
+			more_results, uri = self._search(query, 50, results_before, format)
 			counter += len(more_results)
 			next_uri = uri
 			results += more_results
@@ -65,7 +67,7 @@ class PyBingSearch(object):
 				nothing_counter += 1
 			else:
 				nothing_counter = 0
-			print("\tresults:" , counter, " of limit:", limit, "links-before:", before, "links-after:", after)
+			print("\tresults:" , counter, " of limit:", results_before, "links-before:", before, "links-after:", after)
 			
 			if nothing_counter == 3:
 				finished = True
@@ -86,7 +88,6 @@ class PyBingSearch(object):
 		if self.german:
 			query += " language:de"
 		url = self.QUERY_URL.format(urllib.parse.quote("'{}'".format(query + " language:de")), limit, offset, format)
-
 		r = requests.get(url, auth=("", self.api_key))
 		try:
 			json_results = r.json()

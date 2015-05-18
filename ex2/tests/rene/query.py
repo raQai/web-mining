@@ -14,7 +14,7 @@ def main(argv):
 	print("Query:", query)
 	
 	bing = PyBingSearch()
-	bing.search_all(query, 100)
+	bing.search_all(query, 1000)
 	
 	print("-----------------------")
 	print("hits:", len(bing.list))
