@@ -1,7 +1,8 @@
 #!/usr/local/bin/python3.4
 # -*- coding: utf-8 -*-
-input_file_1 = "out_patrick_yey.txt"
-input_file_2 = "out_kongfoos.txt"
+import sys
+input_file_1 = "out-bing.txt"
+input_file_2 = "out-google.txt"
 output_file = "intersection.txt"
 
 """
@@ -41,6 +42,7 @@ def main():
 		output.write(e + "\n")
 
 	print("comparison finished")
+	sys.exit()
  
 if __name__ == "__main__":
 	main()
