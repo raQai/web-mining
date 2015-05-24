@@ -1,0 +1,27 @@
+
+Variante 1
+
+
+from socket import timeout
+try:
+    response = urllib.request.urlopen(url, timeout=10).read().decode('utf-8')
+except (HTTPError, URLError) as error:
+    logging.error('Data of %s not retrieved because %s\nURL: %s', name, error, url)
+except timeout:
+    logging.error('socket timed out - URL %s', url)
+else:
+    logging.info('Access successful.')
+
+
+Variante 2
+
+
+import urllib2
+import socket
+
+try:
+    response = urllib2.urlopen("http://google.com", None, 2.5)
+except URLError, e:
+    print "Oops, timed out?"
+except socket.timeout:
+    print "Timed out!"
