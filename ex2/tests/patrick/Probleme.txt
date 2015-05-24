@@ -1,11 +1,35 @@
 - Webside erkennt welcher Browser genutzt wird (ggf. für Python keinen zugriff da Bot)
+-> Durch den Header muss hier ein "alternativer" Browser angegeben werden
+
 - Join Relative Links 
+-> Relative Links können zu problemen führen, wenn sie nicht mit der Basisurl zusammengeführt werden
+
 - defrag Fragmente / Parameter
+-> #Links sind links, welche auf einer Seite einen bestimmten Abschnitt markieren.
+   Sie sind keine richtigen Links und können (wenn man sie nicht beachtet) das Ergebnis verfälschen???
+   -> Weiß nicht genau ob das wirklich so ist. Wir behandeln das auf jeden fall nicht sondebar.
+
 - Time 
+-> Wenn ein Visitor zu schnell oder sogar regelmäßig auf einen Host zugreift, kann der Visitor geblockt werden
+   -> Der Host geht dann von einem Bot aus
+   -> Unser Timeout ist daher variabel zwischen 5 und 10 Sekunden und wird Randomisiert
+
 - Host braucht zu lange
+-> Einige Hosts brauchen zu lange für eine Antwort und können 
+   den prozess verlangsamen oder gar stoppen falls kein Timeout gesetzt wird
+
 - Exception handling
+-> Exceptions müssen abgefangen werden. Da Einige Exceptions nur in ausnahmefällen
+   auftreten und somit unter umständen erst am Ende der Crawler-Anfrage (zB nach 900 anfragen)
+   müssen diese ignoriert werden, damit der Crawler weiter seine Daten sammelt.
+   -> Wir sammeln Daten und wollen kein perfektes Programm
 
-
+- Bei paralellisierung unseres Crawlers wurde bei einer zu hohen anzahl an Threads
+  der Anwender vom Provider gesperrt.
+  Der Crawler wurde dabei über einen RaspberryPi-Cluster mit biszu 32 Prozessen gestartet.
+  Der technische Support teilte dabei mit,
+  dass ein automatisierter Prozess den Anwender als "Potenzielles Botnetz" ausfindig gemacht habe
+  -> Kurz darauf wurde der Anwender wieder freigegeben
 
 To Do
 - Exception Handling

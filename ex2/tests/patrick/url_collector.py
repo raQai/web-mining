@@ -13,6 +13,8 @@ Description : url collector
 import sys
 import time
 import threading
+import shutil
+import detect
 from random import randint
 from collections import Counter
 from urllib.request import urlopen, Request
@@ -20,7 +22,7 @@ from urllib.parse import urlparse, urljoin, urldefrag
 from bs4 import BeautifulSoup
 from colorama import Fore, Style
 
-BOUNDARY = 100
+BOUNDARY = 1000
 VISITOR_COUNT = 2
 
 # multi threading locks
@@ -28,7 +30,9 @@ lock_collect = threading.Lock()
 lock_history = threading.Lock()
 
 # can only be accessed with lock_collect
+language_collection = []
 link_collection = []
+link_counter = set()
 unique_links = set()
 visited = set()
 boundary_reached = False
@@ -125,17 +129,19 @@ class visitorThread(threading.Thread):
       req = Request(request_url, headers={'User-Agent': 'Mozilla/5.0'})
 
       print(self.name, 'requesting file')
-      with urlopen(req) as url_fs:
+      with urlopen(req, timeout=5) as url_fs:
         print(self.name, 'parsing content')
         soup = BeautifulSoup(url_fs.read())
 
         print(self.name, 'saving links')
         with lock_collect:
-          for a in soup.find_all('a'):
+          for a in soup('a'):
             if a.has_attr('href'):
               href = a['href']
               if not href.endswith('.png') and not href.endswith('.jpg') and not href.endswith('.pdf') and not href.endswith('.zip'):
+                add_link_to_lang_collection(detect.detect_language(soup.getText(), 30))
                 add_link_to_collection(adjust_url(request_url, href))
+                add_link_to_counter(adjust_url(request_url, href), len(soup('a')))
           visited.add(request_url)
     except Exception:
       print(Fore.RED + self.name, 'Exception caught, skipping', Style.RESET_ALL)
@@ -171,6 +177,14 @@ def add_link_to_collection(url):
   link_collection.append(strip_www(url))
 
 
+def add_link_to_counter(url, count):
+  link_counter.add((strip_www(url), count))
+
+
+def add_link_to_lang_collection(lang):
+  language_collection.append(lang)
+  
+
 def add_link_to_history(url):
   host = urlparse(url).netloc
   seconds = randint(5, 10)
@@ -199,20 +213,31 @@ def strip_www(url):
 ''' printing results '''
 # TODO: adapt to excercise with different sets
 def print_results():
-  cnt = Counter(link_collection)
+  cnt = Counter(link_collection).most_common()
   print('Total links collected:', len(link_collection))
   print('Unique links collected (Counter):', len(cnt))
-  print('Unique links collected (Sets):', len(unique_links.union(visited)))
-  print('Diff')
-  sintersect = set(cnt).intersection(unique_links.union(visited))
-  print(str(len(sintersect)), 'common links')
-  sdifference = set(cnt).symmetric_difference(unique_links.union(visited))
-  for link in sdifference:
-    print(link)
-  print(str(len(sdifference)), 'different links')
-
   print('Links visited:', len(visited))
-
+  with open('links_collection.txt', 'w') as collection_fs:
+    for link, count in cnt:
+      out = format(count, '10d')
+      out += ' \t' + link
+      collection_fs.write(out + '\n')
+  print('links_collection.txt written')
+  with open('links_counter_per_page.txt', 'w') as counter_fs:
+    for link, count in link_counter:
+      out = format(count, '10d')
+      out += ' \t' + link
+      counter_fs.write(out + '\n')
+  print('links_counter_per_page.txt written')
+  cnt = Counter(language_collection).most_common()
+  with open('language_collection.txt', 'w') as collection_fs:
+    for lang, count in cnt:
+      out = format(count, '10d')
+      out += ' \t' + lang
+      collection_fs.write(out + '\n')
+  print('language_collection.txt written')
+    
+  
 
 if __name__ == "__main__":
   main(sys.argv)
