@@ -1,0 +1,32 @@
+import httplib, socket
+import urlparse
+
+def getUrl(url):
+    parts = urlparse.urlsplit(url)
+    server = parts[1]
+    path = parts[2]
+    obj = httplib.HTTPConnection(server,80)
+
+    try:
+        obj.connect()
+    except socket.gaierror:
+        print "Host %s does not exist" % server
+        return
+    except socket.error:
+        print "Cannot connect to %s:%s." % (server, 80)
+        return
+
+    obj.putrequest('HEAD',path)
+    obj.putheader('Accept','*/*')
+    obj.endheaders()
+    response = obj.getresponse()
+    contentType = response.getheader("content-type", "unknown")
+    obj.close()
+    if response.status !=200:
+        print 'Error'
+    else:
+        print 'Awesome'
+
+
+getUrl('http://www.idlebrfffain.com') # not a registered domain
+getUrl('http://8.8.8.8') # not a http server
