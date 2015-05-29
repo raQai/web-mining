@@ -1,2 +1,3 @@
-    142176 	german
-      1651 	english
+    159628 	english
+     22412 	german
+       698 	spanish
